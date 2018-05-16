@@ -108,10 +108,26 @@ function switchCategory(category) {
             break;
             console.log(innovation);
         case impact:
-
+            background.style.visibility = "hidden";
+            background.style.backgroundColor = "#D0021B";
+            var impactQuestion = document.getElementById("impact-question");
+            impactQuestion.style.visibility = "visible";
+            break;
+            console.log(impact);
         case love:
-
+            background.style.visibility = "hidden";
+            background.style.backgroundColor = "#FFA084";
+            var loveQuestion = document.getElementById("love-question");
+            loveQuestion.style.visibility = "visible";
+            break;
+            console.log(love);
         case creativity:
+            background.style.visibility = "hidden";
+            background.style.backgroundColor = "#A999FF";
+            var creativityQuestion = document.getElementById("creativity-question");
+            creativityQuestion.style.visibility = "visible";
+            break;
+            console.log(creativity);
 
     }
 }
@@ -124,9 +140,20 @@ function submitValues(category) {
             console.log(response.value);
             money.push(response.value);
             window.alert(money);
-            var innovationQuestion = document.getElementById("money-question");
+            var moneyQuestion = document.getElementById("money-question");
             moneyQuestion.style.visibility = "hidden";
             backToHome();
+            break;
+        case happiness:
+            totalResponses = totalResponses + 1;
+            var response = document.getElementById("happiness-response");
+            console.log(response.value);
+            happiness.push(response.value);
+            window.alert(happiness);
+            var happinessQuestion = document.getElementById("happiness-question");
+            happinessQuestion.style.visibility = "hidden";
+            backToHome();
+            break;
         case innovation:
             totalResponses = totalResponses + 1;
             var response = document.getElementById("innovation-response");
@@ -136,6 +163,37 @@ function submitValues(category) {
             var innovationQuestion = document.getElementById("innovation-question");
             innovationQuestion.style.visibility = "hidden";
             backToHome();
+            break;
+        case impact:
+            totalResponses = totalResponses + 1;
+            var response = document.getElementById("impact-response");
+            console.log(response.value);
+            impact.push(response.value);
+            window.alert(impact);
+            var impactQuestion = document.getElementById("impact-question");
+            impactQuestion.style.visibility = "hidden";
+            backToHome();
+            break;
+        case love:
+            totalResponses = totalResponses + 1;
+            var response = document.getElementById("love-response");
+            console.log(response.value);
+            love.push(response.value);
+            window.alert(love);
+            var loveQuestion = document.getElementById("love-question");
+            loveQuestion.style.visibility = "hidden";
+            backToHome();
+            break;
+        case creativity:
+            totalResponses = totalResponses + 1;
+            var response = document.getElementById("creativity-response");
+            console.log(response.value);
+            creativity.push(response.value);
+            window.alert(creativity);
+            var creativityQuestion = document.getElementById("creativity-question");
+            creativityQuestion.style.visibility = "hidden";
+            backToHome();
+            break;
     }
 }
 
