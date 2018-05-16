@@ -31,10 +31,6 @@ a {
     flex-wrap: wrap;
 }
 
-.question-container {
-    margin-left: 15%;
-}
-
 div.question {
     display:inline-block;
     padding-top: 5em;
@@ -45,6 +41,14 @@ div.question {
 .item {
     flex-grow: 1;
     flex-basis: 500px;
+}
+p.percentage {
+    margin-top: -4px;
+    margin-left: 7px;
+    display: inline-block;
+    font-family: DIN;
+    color: white;
+    float:left;
 }
 h1 {
     margin: auto;
@@ -75,41 +79,73 @@ input[type=text] {
 input[type=text]:focus {
     outline:none;
 }
-input[type=submit]{
+#submit {
     font-size: .9em;
-    float:right;
+    float:left;
     color: white;
     font-family: DIN;
     border: none;
     background-color: inherit;
     text-decoration: none;
+    text-align: center;
+    padding-left:2em;
+    padding-top: 3px;
+    opacity: 1;
+}
+
+#submit:hover {
+    cursor: pointer;
+    opacity: .5;
+    animation: 2s ease;
+    color: black;
+}
+#submit:focus {
+    cursor: pointer;
+    outline:0;
+}
+
+@keyframes buttonHover {
+    0% {color: white}
+    25% {}
 }
 .money-bar {
+    display:inline-block;
+    float:left;
     width: 80%;
     height: 1em;
     background-color: #7ED321;
 }
 .happiness-bar {
+    display:inline-block;
+    float:left;
     width: 80%;
     height: 1em;
     background-color: #F8E71C;
 }
 .innovation-bar {
+    display:inline-block;
+    float:left;
     width: 80%;
     height: 1em;
     background-color: #2DCFF6;
 }
 .impact-bar {
+    display:inline-block;
+    float:left;
     width: 80%;
     height: 1em;
     background-color: #D0021B;
 }
 .love-bar {
+    display:inline-block;
+    float:left;
     width: 80%;
     height: 1em;
     background-color: #FFA084;
 }
 .creativity-bar {
+    display:inline-block;
+    float:left;
     width: 80%;
     height: 1em;
     background-color: #A999FF;
@@ -120,4 +156,12 @@ input[type=submit]{
 
 .innovation {
     background-color: #49DAFD;
+}
+.question-container {
+    margin-left: 15%;
+    width: 80%;
+    top:0;
+    left: 0;
+    position: absolute;
+    visibility: hidden;
 }

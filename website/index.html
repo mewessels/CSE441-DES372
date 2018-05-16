@@ -2,40 +2,52 @@
 <html lang="en">
 <head>
     <link rel="stylesheet" href="styles/styles.css">
+    <script type="text/javascript" src="scripts/home.js"></script>
     <meta charset="UTF-8">
 </head>
-<body class="main">
+<body class="main" id="main">
     <div class="full-width-text title">
         <h1>WHAT DRIVES YOU?</h1>
     </div>
     <div class="container">
         <div class="item">
             <h3 class="subtitle">MONEY</h3>
-            <div class="money-bar"></div>
+            <div class="money-bar" id="money-bar"></div><p class="percentage" id="money-percentage">0%</p>
         </div>
         <div class="item">
             <h3 class="subtitle">HAPPINESS</h3>
-            <div class="happiness-bar"></div>
+            <div class="happiness-bar" id="happiness-bar"></div><p class="percentage" id="happiness-percentage">0%</p>
         </div>
-        <a class="item" href="./innovation.html">
+        <a class="item" onclick="switchCategory(innovation)" href="#">
             <div class="item">
                 <h3 class="subtitle">INNOVATION</h3>
-                <div class="innovation-bar"></div>
+                <div class="innovation-bar" id="innovation-bar"></div><p class="percentage" id="innovation-percentage">0%</p>
             </div>
         </a>
         <div class="item">
             <h3 class="subtitle">IMPACT</h3>
-            <div class="impact-bar"></div>
+            <div class="impact-bar" id="impact-bar"></div><p class="percentage" id="impact-percentage">0%</p>
         </div>
         <div class="item">
             <h3 class="subtitle">LOVE</h3>
-            <div class="love-bar"></div>
+            <div class="love-bar" id="love-bar"></div><p class="percentage" id="love-percentage">0%</p>
         </div>
         <div class="item">
             <h3 class="subtitle">CREATIVITY</h3>
-            <div class="creativity-bar"></div>
+            <div class="creativity-bar" id="creativity-bar"></div><p class="percentage" id="creativity-percentage">0%</p>
         </div>
     </div>
+    <div class="question-container" id="innovation-question">
+      <div class="question">
+        <h3 class="subtitle">WHAT IS IT ABOUT INNOVATION DRIVES YOU?</h3>
+      </div>
+      <div method="post" class="response">
+        <form name="innovation-form" id="innovation-form">
+          <input type="text" name="quote" id="innovation-response">
+          <button id="submit" onclick="submitValues(innovation)">SUBMIT</button>
+        </form>
+      </div>
+    </div
 
 
 </body>
