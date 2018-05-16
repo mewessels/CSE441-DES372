@@ -10,14 +10,18 @@
         <h1>WHAT DRIVES YOU?</h1>
     </div>
     <div class="container">
-        <div class="item">
-            <h3 class="subtitle">MONEY</h3>
-            <div class="money-bar" id="money-bar"></div><p class="percentage" id="money-percentage">0%</p>
-        </div>
-        <div class="item">
-            <h3 class="subtitle">HAPPINESS</h3>
-            <div class="happiness-bar" id="happiness-bar"></div><p class="percentage" id="happiness-percentage">0%</p>
-        </div>
+        <a class="item" onclick="switchCategory(money)" href="#">
+            <div class="item">
+                <h3 class="subtitle">MONEY</h3>
+                <div class="money-bar" id="money-bar"></div><p class="percentage" id="money-percentage">0%</p>
+            </div>
+        </a>
+        <a class="item" onclick="switchCategory(happiness)" href="#">
+            <div class="item">
+                <h3 class="subtitle">HAPPINESS</h3>
+                <div class="happiness-bar" id="happiness-bar"></div><p class="percentage" id="happiness-percentage">0%</p>
+            </div>
+        </a>
         <a class="item" onclick="switchCategory(innovation)" href="#">
             <div class="item">
                 <h3 class="subtitle">INNOVATION</h3>
@@ -47,7 +51,29 @@
           <button id="submit" onclick="submitValues(innovation)">SUBMIT</button>
         </form>
       </div>
-    </div
+   </div>
+   <div class="question-container" id="happiness-question">
+     <div class="question">
+       <h3 class="subtitle">WHAT IS IT ABOUT HAPPINESS THAT DRIVES YOU?</h3>
+     </div>
+     <div method="post" class="response">
+       <form name="innovation-form" id="happiness-form">
+         <input type="text" name="quote" id="happiness-response">
+         <button id="submit" onclick="submitValues(happiness)">SUBMIT</button>
+       </form>
+     </div>
+  </div>
+    <div class="question-container" id="money-question">
+      <div class="question">
+        <h3 class="subtitle">WHAT IS IT ABOUT MONEY THAT DRIVES YOU?</h3>
+      </div>
+      <div method="post" class="response">
+        <form name="money-form" id="money-form">
+          <input type="text" name="quote" id="money-response">
+          <button id="submit" onclick="submitValues(money)">SUBMIT</button>
+        </form>
+      </div>
+    </div>
 
 
 </body>

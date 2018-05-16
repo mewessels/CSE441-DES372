@@ -84,14 +84,29 @@ function init() {
 function switchCategory(category) {
     switch(category) {
         case money:
-
+            background.style.visibility = "hidden";
+            background.style.backgroundColor = "#7ED321";
+            var moneyQuestion = document.getElementById("money-question");
+            moneyQuestion.style.visibility = "visible";
+            var innovationQuestion = document.getElementById("innovation-question");
+            innovationQuestion.style.visibility = "hidden";
+            break;
+            console.log(money);
         case happiness:
-
+            background.style.visibility = "hidden";
+            background.style.backgroundColor = "#F8E71C";
+            var happinessQuestion = document.getElementById("happiness-question");
+            happinessQuestion.style.visibility = "visible";
+            var happinessQuestion = document.getElementById("happiness-question");
+            break;
+            console.log(happiness);
         case innovation:
             background.style.visibility = "hidden";
             background.style.backgroundColor = "#2DCFF6";
             var innovationQuestion = document.getElementById("innovation-question");
             innovationQuestion.style.visibility = "visible";
+            break;
+            console.log(innovation);
         case impact:
 
         case love:
@@ -103,6 +118,15 @@ function switchCategory(category) {
 
 function submitValues(category) {
     switch(category) {
+        case money:
+            totalResponses = totalResponses + 1;
+            var response = document.getElementById("money-response");
+            console.log(response.value);
+            money.push(response.value);
+            window.alert(money);
+            var innovationQuestion = document.getElementById("money-question");
+            moneyQuestion.style.visibility = "hidden";
+            backToHome();
         case innovation:
             totalResponses = totalResponses + 1;
             var response = document.getElementById("innovation-response");
@@ -117,6 +141,6 @@ function submitValues(category) {
 
 function backToHome() {
     background.style.backgroundColor = "black";
-    background.style.visibility = "visible";
     reloadBars();
+    background.style.visibility = "visible";
 }
