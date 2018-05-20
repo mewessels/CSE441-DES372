@@ -75,6 +75,13 @@ function start() {
     else if (evt.data === 'innovation_off') {
       document.getElementById('innovation_header').style.color = 'black';
     }
+    else if (evt.data === 'impact_on') {
+      document.getElementById('impact_header').style.color = 'red';
+    }
+    else if (evt.data === 'impact_off') {
+      document.getElementById('impact_header').style.color = 'black';
+    }
+
   };
 }
 function buttonclick(e) {
@@ -105,7 +112,12 @@ function submitclick(e) {
   	user_input = document.getElementById('innovation_entry').value;
 	msg_send = "INN&" + user_input;
 	log_id = "innovation_log";
+  } else if (e.id === "impact_send") {
+  	user_input = document.getElementById('impact_entry').value;
+	msg_send = "IMP&" + user_input;
+	log_id = "impact_log";
   }
+
   log("Someone wrote: " + user_input, log_id);
   websock.send(msg_send);
 }
@@ -138,6 +150,15 @@ function submitclick(e) {
 <input id="innovation_entry">
 <button id="innovation_send" onclick="submitclick(this);">Send</button>
 <pre id="innovation_log"></pre>
+
+<!-- Impact -->
+<div id="impact_header"><b>Innovation</b></div>
+<button id="impact_on"  type="button" onclick="buttonclick(this);">On</button> 
+<button id="impact_off" type="button" onclick="buttonclick(this);">Off</button>
+<input id="impact_entry">
+<button id="impact_send" onclick="submitclick(this);">Send</button>
+<pre id="impact_log"></pre>
+
 
 </body>
 </html>
@@ -207,6 +228,16 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
 			else if (strncmp("INN", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, INNOVATION);
 			}
+			else if (strcmp("impact_on", (const char *)payload) == 0) {
+				writeLED(true, IMPACT, responses_per_bar[IMPACT]++);
+			}
+			else if (strcmp("impact_off", (const char *)payload) == 0) {
+				writeLED(false, IMPACT, NUM_LEDS_PER_BAR);
+			}
+			else if (strncmp("IMP", (const char*)payload, 3) == 0) {
+				process_payload((char*)payload, IMPACT);
+			}
+
 			else {
 				Serial.println("Unknown command");
 			}
@@ -258,7 +289,10 @@ static void writeLED(bool LEDon, responses selected_bar, uint8_t number_leds_sel
 		led_fill_color = CRGB::Yellow;
 	} else if (selected_bar == INNOVATION) {
 		led_fill_color = CRGB::Blue;	
+	} else if (selected_bar == IMPACT) {
+		led_fill_color = CRGB::Red;	
 	}
+
 
 	Serial.print("Selected bar (0 = Money, 1 = Happy, etc.): ");
 	Serial.println(selected_bar);
