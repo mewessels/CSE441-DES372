@@ -64,12 +64,17 @@ function start() {
       document.getElementById('money_header').style.color = 'black';
     }
     else if (evt.data === 'happiness_on') {
-      document.getElementById('happiness_header').style.color = 'red';
+      document.getElementById('happiness_header').style.color = 'yellow';
     }
     else if (evt.data === 'happiness_off') {
       document.getElementById('happiness_header').style.color = 'black';
     }
-
+    else if (evt.data === 'innovation_on') {
+      document.getElementById('innovation_header').style.color = 'blue';
+    }
+    else if (evt.data === 'innovation_off') {
+      document.getElementById('innovation_header').style.color = 'black';
+    }
   };
 }
 function buttonclick(e) {
@@ -96,6 +101,10 @@ function submitclick(e) {
   	user_input = document.getElementById('happiness_entry').value;
 	msg_send = "HAP&" + user_input;
 	log_id = "happiness_log";
+  } else if (e.id === "innovation_send") {
+  	user_input = document.getElementById('innovation_entry').value;
+	msg_send = "INN&" + user_input;
+	log_id = "innovation_log";
   }
   log("Someone wrote: " + user_input, log_id);
   websock.send(msg_send);
@@ -122,6 +131,14 @@ function submitclick(e) {
 <button id="happiness_send" onclick="submitclick(this);">Send</button>
 <pre id="happiness_log"></pre>
 
+<!-- Innovation -->
+<div id="innovation_header"><b>Innovation</b></div>
+<button id="innovation_on"  type="button" onclick="buttonclick(this);">On</button> 
+<button id="innovation_off" type="button" onclick="buttonclick(this);">Off</button>
+<input id="innovation_entry">
+<button id="innovation_send" onclick="submitclick(this);">Send</button>
+<pre id="innovation_log"></pre>
+
 </body>
 </html>
 )rawliteral";
@@ -131,11 +148,6 @@ static const uint8_t brightness = 30;
 
 // Current LED status
 bool LEDStatus;
-
-// Commands sent through Web Socket
-//const char LEDON[] = "ledon";
-//const char LEDOFF[] = "ledoff";
-//const char MSG[] = "MSG";
 
 void process_payload(char* payload, responses selection) {
 	Serial.println("User wrote: ");
@@ -186,6 +198,15 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
 			else if (strncmp("HAP", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, HAPPINESS);
 			}
+			else if (strcmp("innovation_on", (const char *)payload) == 0) {
+				writeLED(true, INNOVATION, responses_per_bar[INNOVATION]++);
+			}
+			else if (strcmp("innovation_off", (const char *)payload) == 0) {
+				writeLED(false, INNOVATION, NUM_LEDS_PER_BAR);
+			}
+			else if (strncmp("INN", (const char*)payload, 3) == 0) {
+				process_payload((char*)payload, INNOVATION);
+			}
 			else {
 				Serial.println("Unknown command");
 			}
@@ -234,7 +255,9 @@ static void writeLED(bool LEDon, responses selected_bar, uint8_t number_leds_sel
 	if (selected_bar == MONEY) {
 		led_fill_color = CRGB::Green;	
 	} else if (selected_bar == HAPPINESS) {
-		led_fill_color = CRGB::Red;
+		led_fill_color = CRGB::Yellow;
+	} else if (selected_bar == INNOVATION) {
+		led_fill_color = CRGB::Blue;	
 	}
 
 	Serial.print("Selected bar (0 = Money, 1 = Happy, etc.): ");
