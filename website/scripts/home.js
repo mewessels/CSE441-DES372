@@ -4,7 +4,7 @@ var money;
 var happiness;
 var innovation;
 var impact;
-var love;
+var knowledge;
 var creativity;
 
 var background;
@@ -18,8 +18,8 @@ var happinessPercentage;
 var impactBar;
 var impactPercentage;
 
-var loveBar;
-var lovePercentage;
+var knowledgeBar;
+var knowledgePercentage;
 
 var creativityBar;
 var creativityPercentage;
@@ -43,8 +43,8 @@ function reloadBars() {
     impactBar.style.width = Math.round((impact.length / totalResponses) * 100) + '%';
     impactPercentage.innerHTML = impactBar.style.width;
 
-    loveBar.style.width = Math.round((love.length / totalResponses) * 100) + '%';
-    lovePercentage.innerHTML = loveBar.style.width;
+    knowledgeBar.style.width = Math.round((knowledge.length / totalResponses) * 100) + '%';
+    knowledgePercentage.innerHTML = knowledgeBar.style.width;
 
     creativityBar.style.width = Math.round((creativity.length / totalResponses) * 100) + '%';
     creativityPercentage.innerHTML = creativityBar.style.width;
@@ -55,10 +55,10 @@ function init() {
     happiness = ["a","b","c"];
     innovation = ["a"];
     impact = ["a","b","c","d"];
-    love = ["a","b","c","d","e","f"];
+    knowledge = ["a","b","c","d","e","f"];
     creativity = ["a"];
     totalResponses = money.length + happiness.length + innovation.length + impact.length +
-                        love.length + creativity.length;
+                        knowledge.length + creativity.length;
 
     moneyBar = document.getElementById("money-bar");
     moneyPercentage = document.getElementById("money-percentage");
@@ -72,8 +72,8 @@ function init() {
     impactBar = document.getElementById("impact-bar");
     impactPercentage = document.getElementById("impact-percentage");
 
-    loveBar = document.getElementById("love-bar");
-    lovePercentage = document.getElementById("love-percentage");
+    knowledgeBar = document.getElementById("knowledge-bar");
+    knowledgePercentage = document.getElementById("knowledge-percentage");
 
     creativityBar = document.getElementById("creativity-bar");
     creativityPercentage = document.getElementById("creativity-percentage");
@@ -114,13 +114,13 @@ function switchCategory(category) {
             impactQuestion.style.visibility = "visible";
             break;
             console.log(impact);
-        case love:
+        case knowledge:
             background.style.visibility = "hidden";
-            background.style.backgroundColor = "#FFA084";
-            var loveQuestion = document.getElementById("love-question");
-            loveQuestion.style.visibility = "visible";
+            background.style.backgroundColor = "#FF7F11";
+            var knowledgeQuestion = document.getElementById("knowledge-question");
+            knowledgeQuestion.style.visibility = "visible";
             break;
-            console.log(love);
+            console.log(knowledge);
         case creativity:
             background.style.visibility = "hidden";
             background.style.backgroundColor = "#A999FF";
@@ -179,14 +179,14 @@ function submitValues(category) {
             impactQuestion.style.visibility = "hidden";
             backToHome();
             break;
-        case love:
+        case knowledge:
             totalResponses = totalResponses + 1;
-            var response = document.getElementById("love-response");
+            var response = document.getElementById("knowledge-response");
             console.log(response.value);
-            love.push(response.value);
-            window.alert(love);
-            var loveQuestion = document.getElementById("love-question");
-            loveQuestion.style.visibility = "hidden";
+            knowledge.push(response.value);
+            window.alert(knowledge);
+            var knowledgeQuestion = document.getElementById("knowledge-question");
+            knowledgeQuestion.style.visibility = "hidden";
             backToHome();
             break;
         case creativity:

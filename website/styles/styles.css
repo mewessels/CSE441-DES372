@@ -148,12 +148,12 @@ input[type=text]:focus {
     height: 1em;
     background-color: #D0021B;
 }
-.love-bar {
+.knowledge-bar {
     display:inline-block;
     float:left;
     width: 80%;
     height: 1em;
-    background-color: #FFA084;
+    background-color: #FF7F11;
 }
 .creativity-bar {
     display:inline-block;
