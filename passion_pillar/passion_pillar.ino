@@ -57,11 +57,11 @@ function start() {
   websock.onerror = function(evt) { console.log(evt); };
   websock.onmessage = function(evt) {
     console.log(evt);
-    if (evt.data === 'ledon') {
-      document.getElementById('ledstatus').style.color = 'green';
+    if (evt.data === 'money_on') {
+      document.getElementById('money_header').style.color = 'green';
     }
-    else if (evt.data === 'ledoff') {
-      document.getElementById('ledstatus').style.color = 'black';
+    else if (evt.data === 'money_off') {
+      document.getElementById('money_header').style.color = 'black';
     }
   };
 }
@@ -88,12 +88,24 @@ function submitclick(e) {
 <body onload="javascript:start();">
 <h1>Passion Pillar</h1>
 <h2>What drives you?</h2>
+
+<!-- Money -->
+<div id="money_header"><b>Money</b></div>
+<button id="money_on"  type="button" onclick="buttonclick(this);">On</button> 
+<button id="money_off" type="button" onclick="buttonclick(this);">Off</button>
+<input id="entry">
+<button id="send" onclick="submitclick(this);">Send</button>
+<pre id="money_log"></pre>
+
+<!-- Happiness -->
 <div id="ledstatus"><b>Money</b></div>
 <button id="ledon"  type="button" onclick="buttonclick(this);">On</button> 
 <button id="ledoff" type="button" onclick="buttonclick(this);">Off</button>
 <input id="entry">
 <button id="send" onclick="submitclick(this);">Send</button>
 <pre id="money_log"></pre>
+
+
 </body>
 </html>
 )rawliteral";
@@ -122,20 +134,20 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
 				Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\r\n", num, ip[0], ip[1], ip[2], ip[3], payload);
 				// Send the current LED status
 				if (LEDStatus) {
-					webSocket.sendTXT(num, LEDON, strlen(LEDON));
+					webSocket.sendTXT(num, "money_on", strlen(LEDON));
 				}
 				else {
-					webSocket.sendTXT(num, LEDOFF, strlen(LEDOFF));
+					webSocket.sendTXT(num, "money_off", strlen(LEDOFF));
 				}
 			}
 			break;
 		case WStype_TEXT:
 			Serial.printf("[%u] get Text: %s\r\n", num, payload);
 
-			if (strcmp(LEDON, (const char *)payload) == 0) {
+			if (strcmp("money_on", (const char *)payload) == 0) {
 				writeLED(true, MONEY, responses_per_bar[MONEY]++);
 			}
-			else if (strcmp(LEDOFF, (const char *)payload) == 0) {
+			else if (strcmp("money_off", (const char *)payload) == 0) {
 				writeLED(false, MONEY, NUM_LEDS_PER_BAR);
 			}
 			else if (strncmp(MSG, (const char*)payload, 1) == 0) {
