@@ -19,7 +19,7 @@ FASTLED_USING_NAMESPACE
 
 CRGB leds[NUM_LEDS];
 
-enum responses { MONEY, HAPPINESS, INNOVATION, IMPACT, LOVE, CREATIVITY, MAX_RESPONSES }; 
+enum responses { MONEY, HAPPINESS, INNOVATION, IMPACT, KNOWLEDGE, CREATIVITY, MAX_RESPONSES }; 
 
 // NUM_LEDS_PER_BAR strings for each option (MONEY, HAPPINESS, etc.) allows user to enter a sentence
 static char user_input[MAX_RESPONSES][NUM_LEDS_PER_BAR][128];
@@ -81,6 +81,12 @@ function start() {
     else if (evt.data === 'impact_off') {
       document.getElementById('impact_header').style.color = 'black';
     }
+    else if (evt.data === 'knowledge_on') {
+      document.getElementById('knowledge_header').style.color = 'orange';
+    }
+    else if (evt.data === 'knowledge_off') {
+      document.getElementById('knowledge_header').style.color = 'black';
+    }
 
   };
 }
@@ -116,6 +122,10 @@ function submitclick(e) {
   	user_input = document.getElementById('impact_entry').value;
 	msg_send = "IMP&" + user_input;
 	log_id = "impact_log";
+  } else if (e.id === "knowledge_send") {
+  	user_input = document.getElementById('knowledge_entry').value;
+	msg_send = "KNO&" + user_input;
+	log_id = "knowledge_log";
   }
 
   log("Someone wrote: " + user_input, log_id);
@@ -159,6 +169,13 @@ function submitclick(e) {
 <button id="impact_send" onclick="submitclick(this);">Send</button>
 <pre id="impact_log"></pre>
 
+<!-- Knowledge -->
+<div id="knowledge_header"><b>Knowledge</b></div>
+<button id="knowledge_on"  type="button" onclick="buttonclick(this);">On</button> 
+<button id="knowledge_off" type="button" onclick="buttonclick(this);">Off</button>
+<input id="knowledge_entry">
+<button id="knowledge_send" onclick="submitclick(this);">Send</button>
+<pre id="knowledge_log"></pre>
 
 </body>
 </html>
@@ -237,6 +254,15 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
 			else if (strncmp("IMP", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, IMPACT);
 			}
+			else if (strcmp("knowledge_on", (const char *)payload) == 0) {
+				writeLED(true, KNOWLEDGE, responses_per_bar[KNOWLEDGE]++);
+			}
+			else if (strcmp("knowledge_off", (const char *)payload) == 0) {
+				writeLED(false, KNOWLEDGE, NUM_LEDS_PER_BAR);
+			}
+			else if (strncmp("KNO", (const char*)payload, 3) == 0) {
+				process_payload((char*)payload, KNOWLEDGE);
+			}
 
 			else {
 				Serial.println("Unknown command");
@@ -291,8 +317,9 @@ static void writeLED(bool LEDon, responses selected_bar, uint8_t number_leds_sel
 		led_fill_color = CRGB::Blue;	
 	} else if (selected_bar == IMPACT) {
 		led_fill_color = CRGB::Red;	
+	} else if (selected_bar == KNOWLEDGE) {
+		led_fill_color = CRGB::Orange;
 	}
-
 
 	Serial.print("Selected bar (0 = Money, 1 = Happy, etc.): ");
 	Serial.println(selected_bar);
