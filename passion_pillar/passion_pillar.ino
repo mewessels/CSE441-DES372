@@ -57,12 +57,19 @@ function start() {
   websock.onerror = function(evt) { console.log(evt); };
   websock.onmessage = function(evt) {
     console.log(evt);
-    if (evt.data === 'ledon') {
-      document.getElementById('ledstatus').style.color = 'green';
+    if (evt.data === 'money_on') {
+      document.getElementById('money_header').style.color = 'green';
     }
-    else if (evt.data === 'ledoff') {
-      document.getElementById('ledstatus').style.color = 'black';
+    else if (evt.data === 'money_off') {
+      document.getElementById('money_header').style.color = 'black';
     }
+    else if (evt.data === 'happiness_on') {
+      document.getElementById('happiness_header').style.color = 'red';
+    }
+    else if (evt.data === 'happiness_off') {
+      document.getElementById('happiness_header').style.color = 'black';
+    }
+
   };
 }
 function buttonclick(e) {
@@ -73,27 +80,48 @@ function buttonclick(e) {
   //		but lower down with an anchor
   websock.send(e.id);
 }
-function log(msg) {
-  document.getElementById('money_log').innerText += msg + '\n';
+function log(msg, log_id) {
+  document.getElementById(log_id).innerText += msg + '\n';
   console.log(msg);
 }
 function submitclick(e) {
-  var user_input = document.getElementById('entry').value;
-  var msgSend = "MSG&" + user_input;
-  log("Someone wrote: " + user_input);
-  websock.send(msgSend);
+  var user_input;
+  var msg_send;
+  var log_id;
+  if (e.id === "money_send") {
+  	user_input = document.getElementById('money_entry').value;
+	msg_send = "MON&" + user_input;
+	log_id = "money_log";
+  } else if (e.id === "happiness_send") {
+  	user_input = document.getElementById('happiness_entry').value;
+	msg_send = "HAP&" + user_input;
+	log_id = "happiness_log";
+  }
+  log("Someone wrote: " + user_input, log_id);
+  websock.send(msg_send);
 }
 </script>
 </head>
 <body onload="javascript:start();">
 <h1>Passion Pillar</h1>
 <h2>What drives you?</h2>
-<div id="ledstatus"><b>Money</b></div>
-<button id="ledon"  type="button" onclick="buttonclick(this);">On</button> 
-<button id="ledoff" type="button" onclick="buttonclick(this);">Off</button>
-<input id="entry">
-<button id="send" onclick="submitclick(this);">Send</button>
+
+<!-- Money -->
+<div id="money_header"><b>Money</b></div>
+<button id="money_on"  type="button" onclick="buttonclick(this);">On</button> 
+<button id="money_off" type="button" onclick="buttonclick(this);">Off</button>
+<input id="money_entry">
+<button id="money_send" onclick="submitclick(this);">Send</button>
 <pre id="money_log"></pre>
+
+<!-- Happiness -->
+<div id="happiness_header"><b>Happiness</b></div>
+<button id="happiness_on"  type="button" onclick="buttonclick(this);">On</button> 
+<button id="happiness_off" type="button" onclick="buttonclick(this);">Off</button>
+<input id="happiness_entry">
+<button id="happiness_send" onclick="submitclick(this);">Send</button>
+<pre id="happiness_log"></pre>
+
 </body>
 </html>
 )rawliteral";
@@ -105,9 +133,17 @@ static const uint8_t brightness = 30;
 bool LEDStatus;
 
 // Commands sent through Web Socket
-const char LEDON[] = "ledon";
-const char LEDOFF[] = "ledoff";
-const char MSG[] = "MSG";
+//const char LEDON[] = "ledon";
+//const char LEDOFF[] = "ledoff";
+//const char MSG[] = "MSG";
+
+void process_payload(char* payload, responses selection) {
+	Serial.println("User wrote: ");
+	char *split = strtok(payload, "&");
+	split = strtok(NULL, "&");
+	Serial.print(split);
+	strcpy(user_input[selection][responses_per_bar[selection]], split);
+}
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
 {
@@ -122,28 +158,33 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
 				Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\r\n", num, ip[0], ip[1], ip[2], ip[3], payload);
 				// Send the current LED status
 				if (LEDStatus) {
-					webSocket.sendTXT(num, LEDON, strlen(LEDON));
+					webSocket.sendTXT(num, "money_on", 8);
 				}
 				else {
-					webSocket.sendTXT(num, LEDOFF, strlen(LEDOFF));
+					webSocket.sendTXT(num, "money_off", 9);
 				}
 			}
 			break;
 		case WStype_TEXT:
 			Serial.printf("[%u] get Text: %s\r\n", num, payload);
 
-			if (strcmp(LEDON, (const char *)payload) == 0) {
+			if (strcmp("money_on", (const char *)payload) == 0) {
 				writeLED(true, MONEY, responses_per_bar[MONEY]++);
 			}
-			else if (strcmp(LEDOFF, (const char *)payload) == 0) {
+			else if (strcmp("money_off", (const char *)payload) == 0) {
 				writeLED(false, MONEY, NUM_LEDS_PER_BAR);
 			}
-			else if (strncmp(MSG, (const char*)payload, 1) == 0) {
-				Serial.println("User wrote: ");
-				char *split = strtok((char*)payload, "&");
-				split = strtok(NULL, "&");
-				Serial.print(split);
-				strcpy(user_input[MONEY][responses_per_bar[MONEY]], split);
+			else if (strncmp("MON", (const char*)payload, 3) == 0) {
+				process_payload((char*)payload, MONEY);
+			}
+			else if (strcmp("happiness_on", (const char *)payload) == 0) {
+				writeLED(true, HAPPINESS, responses_per_bar[HAPPINESS]++);
+			}
+			else if (strcmp("happiness_off", (const char *)payload) == 0) {
+				writeLED(false, HAPPINESS, NUM_LEDS_PER_BAR);
+			}
+			else if (strncmp("HAP", (const char*)payload, 3) == 0) {
+				process_payload((char*)payload, HAPPINESS);
 			}
 			else {
 				Serial.println("Unknown command");
@@ -188,22 +229,33 @@ void handleNotFound()
 static void writeLED(bool LEDon, responses selected_bar, uint8_t number_leds_selected)
 {
 	LEDStatus = LEDon;
-	CRGB led_fill_color;	
+	CRGB led_fill_color = CRGB::Black;	
 
 	if (selected_bar == MONEY) {
 		led_fill_color = CRGB::Green;	
-	} else {
-		led_fill_color = CRGB::Black;
+	} else if (selected_bar == HAPPINESS) {
+		led_fill_color = CRGB::Red;
 	}
 
+	Serial.print("Selected bar (0 = Money, 1 = Happy, etc.): ");
+	Serial.println(selected_bar);
+
 	number_leds_selected = ((number_leds_selected >= NUM_LEDS_PER_BAR) ? NUM_LEDS_PER_BAR : number_leds_selected);
+        Serial.print("number_leds_selected = ");
+	Serial.println(number_leds_selected);
+
+	uint8_t starting_idx = selected_bar * NUM_LEDS_PER_BAR;
 	if (LEDon) { // Turn on the LEDs
-		for (int led_idx = selected_bar * NUM_LEDS_PER_BAR; led_idx < number_leds_selected; led_idx++) {
+		for (uint8_t led_idx = starting_idx; led_idx < (number_leds_selected + starting_idx); led_idx++) {
+			Serial.print("led_idx = ");
+			Serial.println(led_idx);
 			leds[led_idx] = led_fill_color;
 		}
 	}
 	else { // Turn off the LEDs
-		for (int led_idx = selected_bar * NUM_LEDS_PER_BAR; led_idx < number_leds_selected; led_idx++) {
+		for (uint8_t led_idx = starting_idx; led_idx < (number_leds_selected + starting_idx); led_idx++) {
+			Serial.print("led_idx = ");
+			Serial.println(led_idx);
 			leds[led_idx] = CRGB::Black;
 		}
 	}
