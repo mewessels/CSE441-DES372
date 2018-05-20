@@ -53,25 +53,22 @@
       </div>
     </div>
     <div class="question-container" id="innovation-question">
-      <h3 class="exit" onclick=>x</h3>
-      <div class="questionAndResponse">
       <div class="question">
         <h3 class="subtitle">WHAT IS IT ABOUT INNOVATION THAT DRIVES YOU?</h3>
       </div>
       <div method="post" class="response">
-        <form name="innovation-form" id="innovation-form">
+        <form name="innovation-form" id="innovation-form" onsubmit="submitValues(innovation); return false;">
           <input type="text" name="quote" id="innovation-response">
           <button type="button" id="submit" onclick="submitValues(innovation)">SUBMIT</button>
         </form>
       </div>
-    </div>
    </div>
    <div class="question-container" id="happiness-question">
      <div class="question">
        <h3 class="subtitle">WHAT IS IT ABOUT HAPPINESS THAT DRIVES YOU?</h3>
      </div>
      <div method="post" class="response">
-       <form name="innovation-form" id="happiness-form">
+       <form name="innovation-form" id="happiness-form" onsubmit="submitValues(happiness); return false;">
          <input type="text" name="quote" id="happiness-response">
          <button type="button" id="submit" onclick="submitValues(happiness)">SUBMIT</button>
        </form>
@@ -82,7 +79,7 @@
         <h3 class="subtitle">WHAT IS IT ABOUT MONEY THAT DRIVES YOU?</h3>
       </div>
       <div method="post" class="response">
-        <form name="money-form" id="money-form">
+        <form name="money-form" id="money-form" onsubmit="submitValues(money); return false;">
           <input type="text" name="quote" id="money-response">
           <button type="button" id="submit" onclick="submitValues(money)">SUBMIT</button>
         </form>
@@ -93,7 +90,7 @@
         <h3 class="subtitle">WHAT IS IT ABOUT IMPACT THAT DRIVES YOU?</h3>
       </div>
       <div method="post" class="response">
-        <form name="impact-form" id="impact-form">
+        <form name="impact-form" id="impact-form" onsubmit="submitValues(impact); return false;">
           <input type="text" name="quote" id="money-response">
           <button type="button" id="submit" onclick="submitValues(impact)">SUBMIT</button>
         </form>
@@ -104,7 +101,7 @@
         <h3 class="subtitle">WHAT IS IT ABOUT KNOWLEDGE THAT DRIVES YOU?</h3>
       </div>
       <div method="post" class="response">
-        <form name="knowledge-form" id="knowledge-form">
+        <form name="knowledge-form" id="knowledge-form" onsubmit="submitValues(knowledge); return false;">
           <input type="text" name="quote" id="knowledge-response">
           <button type="button" id="submit" onclick="submitValues(knowledge)">SUBMIT</button>
         </form>
@@ -115,7 +112,7 @@
         <h3 class="subtitle">WHAT IS IT ABOUT CREATIVITY THAT DRIVES YOU?</h3>
       </div>
       <div method="post" class="response">
-        <form name="creativity-form" id="creativity-form">
+        <form name="creativity-form" id="creativity-form" onsubmit="submitValues(creativity); return false;">
           <input type="text" name="quote" id="creativity-response">
           <button type="button" id="submit" onclick="submitValues(creativity)">SUBMIT</button>
         </form>
