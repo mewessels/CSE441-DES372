@@ -26,9 +26,9 @@ a {
 }
 
 .container {
-    margin-left: 15%;
-    display: flex;
-    flex-wrap: wrap;
+    /*display: flex;
+    flex-wrap: wrap;*/
+
 }
 
 div.question {
@@ -39,8 +39,20 @@ div.question {
 }
 
 .item {
-    flex-grow: 1;
-    flex-basis: 500px;
+    /*flex-grow: 1;
+    flex-basis: 500px;*/
+
+}
+
+.category {
+  margin: 2em;
+}
+
+.categoryButton {
+  border-style: solid;
+  border-color: white;
+  border-width: thick;
+  text-align: center;
 }
 p.percentage {
     margin-top: -4px;
@@ -52,7 +64,7 @@ p.percentage {
 }
 h1 {
     margin: auto;
-    font-size: 6em;
+    font-size: 3.5em;
     font-family: DIN;
     color: white;
 }
@@ -164,4 +176,9 @@ input[type=text]:focus {
     left: 0;
     position: absolute;
     visibility: hidden;
+}
+
+.column {
+  float: left;
+width: 50%;
 }

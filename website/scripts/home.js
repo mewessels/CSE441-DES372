@@ -141,6 +141,11 @@ function submitValues(category) {
             money.push(response.value);
             window.alert(money);
             var moneyQuestion = document.getElementById("money-question");
+            var div = document.createElement("div");
+            var responseParagraph = document.createElement("p");
+            responseParagraph.innerHTML = response.value;
+            div.appendChild(responseParagraph);
+            document.getElementById("main").appendChild(div);
             moneyQuestion.style.visibility = "hidden";
             backToHome();
             break;
