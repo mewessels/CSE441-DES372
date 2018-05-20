@@ -123,44 +123,50 @@ input[type=text]:focus {
 .money-bar {
     display:inline-block;
     float:left;
-    width: 80%;
+    width: 0%;
     height: 1em;
     background-color: #7ED321;
+    transition: width 2s;
 }
 .happiness-bar {
     display:inline-block;
     float:left;
-    width: 80%;
+    width: 0%;
     height: 1em;
     background-color: #F8E71C;
+    transition: width 2s;
 }
 .innovation-bar {
     display:inline-block;
     float:left;
-    width: 80%;
+    width: 0%;
     height: 1em;
     background-color: #2DCFF6;
+    transition: width 2s;
 }
 .impact-bar {
     display:inline-block;
     float:left;
-    width: 80%;
+    width: 0%;
     height: 1em;
     background-color: #D0021B;
+    transition: width 2s;
 }
 .knowledge-bar {
     display:inline-block;
     float:left;
-    width: 80%;
+    width: 0%;
     height: 1em;
     background-color: #FF7F11;
+    transition: width 2s;
 }
 .creativity-bar {
     display:inline-block;
     float:left;
-    width: 80%;
+    width: 0%;
     height: 1em;
     background-color: #A999FF;
+    transition: width 2s;
 }
 .main {
     background-color: black;
