@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Passion Pillar</title>
+    <link rel="stylesheet" href="styles/styles.css">
+    <script type="text/javascript" src="scripts/home2.js"></script>
+    <script type="text/javascript" src="scripts/lights.js"></script>
+    <meta charset="UTF-8">
+</head>
+<body class="main" id="main">
+    <div class="full-width-text title">
+        <h1>WHICH OF THE FOLLOWING IS YOUR GREATEST MOTIVATION FOR PURSUING HIGHER EDUCATION?</h1>
+    </div>
+    <div class="container">
+      <div class="column">
+        <a class="item" onclick="switchCategory(money)" href="#">
+            <div class="category">
+                <h3 class="categoryButton">MONEY</h3>
+                <div class="money-bar" id="money-bar"></div><p class="percentage" id="money-percentage">0%</p>
+            </div>
+        </a>
+        <a class="item" onclick="switchCategory(happiness)" href="#">
+            <div class="category">
+                <h3 class="categoryButton">HAPPINESS</h3>
+                <div class="happiness-bar" id="happiness-bar"></div><p class="percentage" id="happiness-percentage">0%</p>
+            </div>
+        </a>
+        <a class="item" onclick="switchCategory(innovation)" href="#">
+            <div class="category">
+                <h3 class="categoryButton">INNOVATION</h3>
+                <div class="innovation-bar" id="innovation-bar"></div><p class="percentage" id="innovation-percentage">0%</p>
+            </div>
+        </a>
+      </div>
+      <div class="column">
+        <a class="item" onclick="switchCategory(impact)" href="#">
+        <div class="category">
+            <h3 class="categoryButton">IMPACT</h3>
+            <div class="impact-bar" id="impact-bar"></div><p class="percentage" id="impact-percentage">0%</p>
+        </div>
+        </a>
+        <a class="item" onclick="switchCategory(knowledge)" href="#">
+        <div class="category">
+            <h3 class="categoryButton">KNOWLEDGE</h3>
+            <div class="knowledge-bar" id="knowledge-bar"></div><p class="percentage" id="knowledge-percentage">0%</p>
+        </div>
+        </a>
+        <a class="item" onclick="switchCategory(creativity)" href="#">
+        <div class="category">
+            <h3 class="categoryButton">CREATIVITY</h3>
+            <div class="creativity-bar" id="creativity-bar"></div><p class="percentage" id="creativity-percentage">0%</p>
+        </div>
+        </a>
+      </div>
+    </div>
+    <div class="question-container" id="innovation-question">
+      <div class="question">
+        <h3 class="subtitle">WHAT IS IT ABOUT INNOVATION THAT DRIVES YOU?</h3>
+      </div>
+      <div method="post" class="response">
+        <button class="white-button" id="innovation_on"  type="button" onclick="buttonclick(this);">On</button>
+        <button class="white-button" id="innovation_off" type="button" onclick="buttonclick(this);">Off</button>
+        <br>
+        <br>
+        <br>
+        <input type="text" id="innovation_entry">
+        <button class="white-button" id="innovation_send" onclick="submitclick(this);">SUBMIT</button>
+        <br>
+        <br>
+        <pre id="innovation_log"></pre>
+      </div>
+
+   </div>
+
+   <div class="question-container" id="happiness-question">
+     <div class="question">
+       <h3 class="subtitle">WHAT IS IT ABOUT HAPPINESS THAT DRIVES YOU?</h3>
+     </div>
+     <div method="post" class="response">
+       <button class="white-button" id="happiness_on"  type="button" onclick="buttonclick(this);">On</button>
+       <button class="white-button" id="happiness_off" type="button" onclick="buttonclick(this);">Off</button>
+       <br>
+       <br>
+       <br>
+       <input type="text" id="happiness_entry">
+       <button class="white-button" id="happiness_send" onclick="submitclick(this);">SUBMIT</button>
+       <br>
+       <br>
+       <pre id="happiness_log"></pre>
+     </div>
+  </div>
+    <div class="question-container" id="money-question">
+      <div class="question">
+        <h3 class="subtitle">WHAT IS IT ABOUT MONEY THAT DRIVES YOU?</h3>
+      </div>
+      <div method="post" class="response">
+        <button class="white-button" id="money_on"  type="button" onclick="buttonclick(this);">On</button>
+        <button class="white-button" id="money_off" type="button" onclick="buttonclick(this);">Off</button>
+        <br>
+        <br>
+        <br>
+        <input type="text" id="money_entry">
+        <button class="white-button" id="money_send" onclick="submitclick(this);">SUBMIT</button>
+        <br>
+        <br>
+        <pre id="money_log"></pre>
+      </div>
+    </div>
+    <div class="question-container" id="impact-question">
+      <div class="question">
+        <h3 class="subtitle">WHAT IS IT ABOUT IMPACT THAT DRIVES YOU?</h3>
+      </div>
+      <div method="post" class="response">
+        <button class="white-button" id="impact_on"  type="button" onclick="buttonclick(this);">On</button>
+        <button class="white-button" id="impact_off" type="button" onclick="buttonclick(this);">Off</button>
+        <br>
+        <br>
+        <br>
+        <input type="text" id="impact_entry">
+        <button class="white-button" id="impact_send" onclick="submitclick(this);">SUBMIT</button>
+        <br>
+        <br>
+        <pre id="impact_log"></pre>
+      </div>
+    </div>
+    <div class="question-container" id="knowledge-question">
+      <div class="question">
+        <h3 class="subtitle">WHAT IS IT ABOUT KNOWLEDGE THAT DRIVES YOU?</h3>
+      </div>
+      <div method="post" class="response">
+        <button class="white-button" id="knowledge_on"  type="button" onclick="buttonclick(this);">On</button>
+        <button class="white-button" id="knowledge_off" type="button" onclick="buttonclick(this);">Off</button>
+        <br>
+        <br>
+        <br>
+        <input type="text" id="knowledge_entry">
+        <button class="white-button" id="knowledge_send" onclick="submitclick(this);">SUBMIT</button>
+        <br>
+        <br>
+        <pre id="knowledge_log"></pre>
+      </div>
+    </div>
+    <div class="question-container" id="creativity-question">
+      <div class="question">
+        <h3 class="subtitle">WHAT IS IT ABOUT CREATIVITY THAT DRIVES YOU?</h3>
+      </div>
+      <div method="post" class="response">
+        <button class="white-button" id="creativity_on"  type="button" onclick="buttonclick(this);">On</button>
+        <button class="white-button" id="creativity_off" type="button" onclick="buttonclick(this);">Off</button>
+        <br>
+        <br>
+        <br>
+        <input type="text" id="creativity_entry">
+        <button class="white-button" id="creativity_send" onclick="submitclick(this);">SUBMIT</button>
+        <br>
+        <br>
+        <pre id="creativity_log"></pre>
+      </div>
+    </div>
+
+</body>
+
+</html>

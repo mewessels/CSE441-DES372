@@ -19,7 +19,7 @@ FASTLED_USING_NAMESPACE
 
 CRGB leds[NUM_LEDS];
 
-enum responses { MONEY, HAPPINESS, INNOVATION, IMPACT, KNOWLEDGE, CREATIVITY, MAX_RESPONSES }; 
+enum responses { MONEY, HAPPINESS, INNOVATION, IMPACT, KNOWLEDGE, CREATIVITY, MAX_RESPONSES };
 
 // NUM_LEDS_PER_BAR strings for each option (MONEY, HAPPINESS, etc.) allows user to enter a sentence
 static char user_input[MAX_RESPONSES][NUM_LEDS_PER_BAR][128];
@@ -38,166 +38,169 @@ ESP8266WebServer server(80);
 WebSocketsServer webSocket = WebSocketsServer(81);
 
 static const char PROGMEM INDEX_HTML[] = R"rawliteral(
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Passion Pillar</title>
-    <meta charset="UTF-8">
-</head>
-<body class="main" id="main">
-<style>
-"body { background-color: #808080; font-family: Arial, Helvetica, Sans-Serif; Color: #000000; }"
-</style>
-<script>
-var websock;
-function start() {
-  websock = new WebSocket('ws://' + window.location.hostname + ':81/');
-  websock.onopen = function(evt) { console.log('websock open'); };
-  websock.onclose = function(evt) { console.log('websock close'); };
-  websock.onerror = function(evt) { console.log(evt); };
-  websock.onmessage = function(evt) {
-    console.log(evt);
-    if (evt.data === 'money_on') {
-      document.getElementById('money_header').style.color = 'green';
-    }
-    else if (evt.data === 'money_off') {
-      document.getElementById('money_header').style.color = 'black';
-    }
-    else if (evt.data === 'happiness_on') {
-      document.getElementById('happiness_header').style.color = 'yellow';
-    }
-    else if (evt.data === 'happiness_off') {
-      document.getElementById('happiness_header').style.color = 'black';
-    }
-    else if (evt.data === 'innovation_on') {
-      document.getElementById('innovation_header').style.color = 'blue';
-    }
-    else if (evt.data === 'innovation_off') {
-      document.getElementById('innovation_header').style.color = 'black';
-    }
-    else if (evt.data === 'impact_on') {
-      document.getElementById('impact_header').style.color = 'red';
-    }
-    else if (evt.data === 'impact_off') {
-      document.getElementById('impact_header').style.color = 'black';
-    }
-    else if (evt.data === 'knowledge_on') {
-      document.getElementById('knowledge_header').style.color = 'orange';
-    }
-    else if (evt.data === 'knowledge_off') {
-      document.getElementById('knowledge_header').style.color = 'black';
-    }
-    else if (evt.data === 'creativity_on') {
-      document.getElementById('creativity_header').style.color = 'purple';
-    }
-    else if (evt.data === 'creativity_off') {
-      document.getElementById('creativity_header').style.color = 'black';
-    }
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <title>Passion Pillar</title>
+      <link rel="stylesheet" href="styles/styles.css">
+      <script type="text/javascript" src="scripts/home2.js"></script>
+      <script type="text/javascript" src="scripts/lights.js"></script>
+      <meta charset="UTF-8">
+  </head>
+  <body class="main" id="main">
+      <div class="full-width-text title">
+          <h1>WHICH OF THE FOLLOWING IS YOUR GREATEST MOTIVATION FOR PURSUING HIGHER EDUCATION?</h1>
+      </div>
+      <div class="container">
+        <div class="column">
+          <a class="item" onclick="switchCategory(money)" href="#">
+              <div class="category">
+                  <h3 class="categoryButton">MONEY</h3>
+                  <div class="money-bar" id="money-bar"></div><p class="percentage" id="money-percentage">0%</p>
+              </div>
+          </a>
+          <a class="item" onclick="switchCategory(happiness)" href="#">
+              <div class="category">
+                  <h3 class="categoryButton">HAPPINESS</h3>
+                  <div class="happiness-bar" id="happiness-bar"></div><p class="percentage" id="happiness-percentage">0%</p>
+              </div>
+          </a>
+          <a class="item" onclick="switchCategory(innovation)" href="#">
+              <div class="category">
+                  <h3 class="categoryButton">INNOVATION</h3>
+                  <div class="innovation-bar" id="innovation-bar"></div><p class="percentage" id="innovation-percentage">0%</p>
+              </div>
+          </a>
+        </div>
+        <div class="column">
+          <a class="item" onclick="switchCategory(impact)" href="#">
+          <div class="category">
+              <h3 class="categoryButton">IMPACT</h3>
+              <div class="impact-bar" id="impact-bar"></div><p class="percentage" id="impact-percentage">0%</p>
+          </div>
+          </a>
+          <a class="item" onclick="switchCategory(knowledge)" href="#">
+          <div class="category">
+              <h3 class="categoryButton">KNOWLEDGE</h3>
+              <div class="knowledge-bar" id="knowledge-bar"></div><p class="percentage" id="knowledge-percentage">0%</p>
+          </div>
+          </a>
+          <a class="item" onclick="switchCategory(creativity)" href="#">
+          <div class="category">
+              <h3 class="categoryButton">CREATIVITY</h3>
+              <div class="creativity-bar" id="creativity-bar"></div><p class="percentage" id="creativity-percentage">0%</p>
+          </div>
+          </a>
+        </div>
+      </div>
+      <div class="question-container" id="innovation-question">
+        <div class="question">
+          <h3 class="subtitle">WHAT IS IT ABOUT INNOVATION THAT DRIVES YOU?</h3>
+        </div>
+        <div method="post" class="response">
+          <button class="white-button" id="innovation_on"  type="button" onclick="buttonclick(this);">On</button>
+          <button class="white-button" id="innovation_off" type="button" onclick="buttonclick(this);">Off</button>
+          <br>
+          <br>
+          <br>
+          <input type="text" id="innovation_entry">
+          <button class="white-button" id="innovation_send" onclick="submitclick(this);">SUBMIT</button>
+          <br>
+          <br>
+          <pre id="innovation_log"></pre>
+        </div>
 
+     </div>
 
-  };
-}
-function buttonclick(e) {
-  // @TODO: When the user presses this button (makes selection),
-  //		redirect the user to a new page which
-  //		asks them to submit some thoughts about that
-  //		-- or redirects the user ot the same page
-  //		but lower down with an anchor
-  websock.send(e.id);
-}
-function log(msg, log_id) {
-  document.getElementById(log_id).innerText += msg + '\n';
-  console.log(msg);
-}
-function submitclick(e) {
-  var user_input;
-  var msg_send;
-  var log_id;
-  if (e.id === "money_send") {
-  	user_input = document.getElementById('money_entry').value;
-	msg_send = "MON&" + user_input;
-	log_id = "money_log";
-  } else if (e.id === "happiness_send") {
-  	user_input = document.getElementById('happiness_entry').value;
-	msg_send = "HAP&" + user_input;
-	log_id = "happiness_log";
-  } else if (e.id === "innovation_send") {
-  	user_input = document.getElementById('innovation_entry').value;
-	msg_send = "INN&" + user_input;
-	log_id = "innovation_log";
-  } else if (e.id === "impact_send") {
-  	user_input = document.getElementById('impact_entry').value;
-	msg_send = "IMP&" + user_input;
-	log_id = "impact_log";
-  } else if (e.id === "knowledge_send") {
-  	user_input = document.getElementById('knowledge_entry').value;
-	msg_send = "KNO&" + user_input;
-	log_id = "knowledge_log";
-  } else if (e.id === "creativity_send") {
-  	user_input = document.getElementById('creativity_entry').value;
-	msg_send = "CRE&" + user_input;
-	log_id = "creativity_log";
-  }
+     <div class="question-container" id="happiness-question">
+       <div class="question">
+         <h3 class="subtitle">WHAT IS IT ABOUT HAPPINESS THAT DRIVES YOU?</h3>
+       </div>
+       <div method="post" class="response">
+         <button class="white-button" id="happiness_on"  type="button" onclick="buttonclick(this);">On</button>
+         <button class="white-button" id="happiness_off" type="button" onclick="buttonclick(this);">Off</button>
+         <br>
+         <br>
+         <br>
+         <input type="text" id="happiness_entry">
+         <button class="white-button" id="happiness_send" onclick="submitclick(this);">SUBMIT</button>
+         <br>
+         <br>
+         <pre id="happiness_log"></pre>
+       </div>
+    </div>
+      <div class="question-container" id="money-question">
+        <div class="question">
+          <h3 class="subtitle">WHAT IS IT ABOUT MONEY THAT DRIVES YOU?</h3>
+        </div>
+        <div method="post" class="response">
+          <button class="white-button" id="money_on"  type="button" onclick="buttonclick(this);">On</button>
+          <button class="white-button" id="money_off" type="button" onclick="buttonclick(this);">Off</button>
+          <br>
+          <br>
+          <br>
+          <input type="text" id="money_entry">
+          <button class="white-button" id="money_send" onclick="submitclick(this);">SUBMIT</button>
+          <br>
+          <br>
+          <pre id="money_log"></pre>
+        </div>
+      </div>
+      <div class="question-container" id="impact-question">
+        <div class="question">
+          <h3 class="subtitle">WHAT IS IT ABOUT IMPACT THAT DRIVES YOU?</h3>
+        </div>
+        <div method="post" class="response">
+          <button class="white-button" id="impact_on"  type="button" onclick="buttonclick(this);">On</button>
+          <button class="white-button" id="impact_off" type="button" onclick="buttonclick(this);">Off</button>
+          <br>
+          <br>
+          <br>
+          <input type="text" id="impact_entry">
+          <button class="white-button" id="impact_send" onclick="submitclick(this);">SUBMIT</button>
+          <br>
+          <br>
+          <pre id="impact_log"></pre>
+        </div>
+      </div>
+      <div class="question-container" id="knowledge-question">
+        <div class="question">
+          <h3 class="subtitle">WHAT IS IT ABOUT KNOWLEDGE THAT DRIVES YOU?</h3>
+        </div>
+        <div method="post" class="response">
+          <button class="white-button" id="knowledge_on"  type="button" onclick="buttonclick(this);">On</button>
+          <button class="white-button" id="knowledge_off" type="button" onclick="buttonclick(this);">Off</button>
+          <br>
+          <br>
+          <br>
+          <input type="text" id="knowledge_entry">
+          <button class="white-button" id="knowledge_send" onclick="submitclick(this);">SUBMIT</button>
+          <br>
+          <br>
+          <pre id="knowledge_log"></pre>
+        </div>
+      </div>
+      <div class="question-container" id="creativity-question">
+        <div class="question">
+          <h3 class="subtitle">WHAT IS IT ABOUT CREATIVITY THAT DRIVES YOU?</h3>
+        </div>
+        <div method="post" class="response">
+          <button class="white-button" id="creativity_on"  type="button" onclick="buttonclick(this);">On</button>
+          <button class="white-button" id="creativity_off" type="button" onclick="buttonclick(this);">Off</button>
+          <br>
+          <br>
+          <br>
+          <input type="text" id="creativity_entry">
+          <button class="white-button" id="creativity_send" onclick="submitclick(this);">SUBMIT</button>
+          <br>
+          <br>
+          <pre id="creativity_log"></pre>
+        </div>
+      </div>
 
-  log("Someone wrote: " + user_input, log_id);
-  websock.send(msg_send);
-}
-</script>
-</head>
-<body onload="javascript:start();">
-<h1>Passion Pillar</h1>
-<h2>What drives you?</h2>
+  </body>
 
-<!-- Money -->
-<div id="money_header"><b>Money</b></div>
-<button id="money_on"  type="button" onclick="buttonclick(this);">On</button> 
-<button id="money_off" type="button" onclick="buttonclick(this);">Off</button>
-<input id="money_entry">
-<button id="money_send" onclick="submitclick(this);">Send</button>
-<pre id="money_log"></pre>
-
-<!-- Happiness -->
-<div id="happiness_header"><b>Happiness</b></div>
-<button id="happiness_on"  type="button" onclick="buttonclick(this);">On</button> 
-<button id="happiness_off" type="button" onclick="buttonclick(this);">Off</button>
-<input id="happiness_entry">
-<button id="happiness_send" onclick="submitclick(this);">Send</button>
-<pre id="happiness_log"></pre>
-
-<!-- Innovation -->
-<div id="innovation_header"><b>Innovation</b></div>
-<button id="innovation_on"  type="button" onclick="buttonclick(this);">On</button> 
-<button id="innovation_off" type="button" onclick="buttonclick(this);">Off</button>
-<input id="innovation_entry">
-<button id="innovation_send" onclick="submitclick(this);">Send</button>
-<pre id="innovation_log"></pre>
-
-<!-- Impact -->
-<div id="impact_header"><b>Impact</b></div>
-<button id="impact_on"  type="button" onclick="buttonclick(this);">On</button> 
-<button id="impact_off" type="button" onclick="buttonclick(this);">Off</button>
-<input id="impact_entry">
-<button id="impact_send" onclick="submitclick(this);">Send</button>
-<pre id="impact_log"></pre>
-
-<!-- Knowledge -->
-<div id="knowledge_header"><b>Knowledge</b></div>
-<button id="knowledge_on"  type="button" onclick="buttonclick(this);">On</button> 
-<button id="knowledge_off" type="button" onclick="buttonclick(this);">Off</button>
-<input id="knowledge_entry">
-<button id="knowledge_send" onclick="submitclick(this);">Send</button>
-<pre id="knowledge_log"></pre>
-
-<!-- Creativity -->
-<div id="creativity_header"><b>Creativity</b></div>
-<button id="creativity_on"  type="button" onclick="buttonclick(this);">On</button> 
-<button id="creativity_off" type="button" onclick="buttonclick(this);">Off</button>
-<input id="creativity_entry">
-<button id="creativity_send" onclick="submitclick(this);">Send</button>
-<pre id="creativity_log"></pre>
-
-</body>
-</html>
+  </html>
 )rawliteral";
 
 // 0->255 where 255 is max brightness
@@ -335,16 +338,16 @@ void handleNotFound()
 static void writeLED(bool LEDon, responses selected_bar, uint8_t number_leds_selected)
 {
 	LEDStatus = LEDon;
-	CRGB led_fill_color = CRGB::Black;	
+	CRGB led_fill_color = CRGB::Black;
 
 	if (selected_bar == MONEY) {
-		led_fill_color = CRGB::Green;	
+		led_fill_color = CRGB::Green;
 	} else if (selected_bar == HAPPINESS) {
 		led_fill_color = CRGB::Yellow;
 	} else if (selected_bar == INNOVATION) {
-		led_fill_color = CRGB::Blue;	
+		led_fill_color = CRGB::Blue;
 	} else if (selected_bar == IMPACT) {
-		led_fill_color = CRGB::Red;	
+		led_fill_color = CRGB::Red;
 	} else if (selected_bar == KNOWLEDGE) {
 		led_fill_color = CRGB::Orange;
 	}  else if (selected_bar == CREATIVITY) {
