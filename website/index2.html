@@ -2,32 +2,568 @@
 <html lang="en">
 <head>
     <title>Passion Pillar</title>
-    <link rel="stylesheet" href="styles/styles.css">
-    <script type="text/javascript" src="scripts/home2.js"></script>
+    <style>
+
+
+    a {
+        text-decoration: none;
+    }
+    .full-width-text {
+        width: 100%;
+        text-align: center;
+        font-family: avenir;
+    }
+
+    .title {
+        padding-top: 5em;
+        padding-bottom: 5em;
+    }
+
+    .container {
+        /*display: flex;
+        flex-wrap: wrap;*/
+
+    }
+
+    div.question {
+        display:inline-block;
+        padding-top: 5em;
+        max-width: 400px;
+        padding-bottom: 2em;
+    }
+
+    .item {
+        /*flex-grow: 1;
+        flex-basis: 500px;*/
+
+    }
+
+    .category {
+      margin: 2em;
+    }
+
+    .categoryButton {
+      border-style: solid;
+      border-color: white;
+      border-width: thick;
+      text-align: center;
+      font-family: avenir;
+    }
+    p.percentage {
+        margin-top: -4px;
+        margin-left: 7px;
+        display: inline-block;
+        color: white;
+        float:left;
+    }
+    h1 {
+        margin: auto;
+        font-size: 3.5em;
+        color: white;
+    }
+
+    h3 {
+        font-size: 2.2em;
+        color: white;
+        margin-bottom: .25em;
+    }
+    form {
+        width: 80%;
+    }
+    input[type=text] {
+        font-family: futura;
+        color: white;
+        font-size: 24px;
+        border: none;
+        background-color: inherit;
+        border-bottom: 6px solid white;
+        width: 80%;
+        float:left;
+    }
+    input[type=text]:focus {
+        outline:none;
+    }
+    #submit {
+        font-size: .9em;
+        float:left;
+        color: white;
+
+        border: none;
+        background-color: inherit;
+        text-decoration: none;
+        text-align: center;
+        padding-left:2em;
+        padding-top: 3px;
+        opacity: 1;
+    }
+
+    #submit:hover {
+        cursor: pointer;
+        opacity: .5;
+        animation: 2s ease;
+        color: black;
+    }
+    #submit:focus {
+        cursor: pointer;
+        outline:0;
+    }
+
+    .white-button {
+        font-size: .9em;
+        float:left;
+        color: white;
+
+        border: none;
+        background-color: inherit;
+        text-decoration: none;
+        text-align: center;
+        padding-top: 3px;
+        opacity: 1;
+        border-style: solid;
+        border-color: white;
+        border-width: thick;
+        font-family: futura;
+    }
+
+    .white-button:hover {
+        cursor: pointer;
+        opacity: .5;
+        animation: 2s ease;
+        color: black;
+    }
+    .white-button:focus {
+        cursor: pointer;
+        outline:0;
+    }
+
+    @keyframes buttonHover {
+        0% {color: white}
+        25% {}
+    }
+    .money-bar {
+        display:inline-block;
+        float:left;
+        width: 0%;
+        height: 1em;
+        background-color: #7ED321;
+        transition: width 2s;
+    }
+    .happiness-bar {
+        display:inline-block;
+        float:left;
+        width: 0%;
+        height: 1em;
+        background-color: #F8E71C;
+        transition: width 2s;
+    }
+    .innovation-bar {
+        display:inline-block;
+        float:left;
+        width: 0%;
+        height: 1em;
+        background-color: #2DCFF6;
+        transition: width 2s;
+    }
+    .impact-bar {
+        display:inline-block;
+        float:left;
+        width: 0%;
+        height: 1em;
+        background-color: #D0021B;
+        transition: width 2s;
+    }
+    .knowledge-bar {
+        display:inline-block;
+        float:left;
+        width: 0%;
+        height: 1em;
+        background-color: #FF7F11;
+        transition: width 2s;
+    }
+    .creativity-bar {
+        display:inline-block;
+        float:left;
+        width: 0%;
+        height: 1em;
+        background-color: #A999FF;
+        transition: width 2s;
+    }
+    .main {
+        background-color: black;
+    }
+
+    .innovation {
+        background-color: #49DAFD;
+    }
+    .question-container {
+        margin-left: 15%;
+        width: 80%;
+        top:0;
+        left: 0;
+        position: absolute;
+        visibility: hidden;
+        font-family: futura;
+    }
+
+    .column {
+      float: left;
+    width: 50%;
+    }
+
+    </style>
+    <script>
+    var websock;
+    var totalResponses;
+    var money;
+    var happiness;
+    var innovation;
+    var impact;
+    var knowledge;
+    var creativity;
+
+    var background;
+
+    var moneyBar;
+    var moneyPercentage;
+
+    var happinessBar;
+    var happinessPercentage;
+
+    var impactBar;
+    var impactPercentage;
+
+    var knowledgeBar;
+    var knowledgePercentage;
+
+    var creativityBar;
+    var creativityPercentage;
+
+    function start() {
+      websock = new WebSocket('ws://' + window.location.hostname + ':81/');
+      websock.onopen = function(evt) { console.log('websock open'); };
+      websock.onclose = function(evt) { console.log('websock close'); };
+      websock.onerror = function(evt) { console.log(evt); };
+      websock.onmessage = function(evt) {
+        console.log(evt);
+        if (evt.data === 'money_on') {
+          document.getElementById('money_header').style.color = 'green';
+        }
+        else if (evt.data === 'money_off') {
+          document.getElementById('money_header').style.color = 'black';
+        }
+        else if (evt.data === 'happiness_on') {
+          document.getElementById('happiness_header').style.color = 'yellow';
+        }
+        else if (evt.data === 'happiness_off') {
+          document.getElementById('happiness_header').style.color = 'black';
+        }
+        else if (evt.data === 'innovation_on') {
+          document.getElementById('innovation_header').style.color = 'blue';
+        }
+        else if (evt.data === 'innovation_off') {
+          document.getElementById('innovation_header').style.color = 'black';
+        }
+        else if (evt.data === 'impact_on') {
+          document.getElementById('impact_header').style.color = 'red';
+        }
+        else if (evt.data === 'impact_off') {
+          document.getElementById('impact_header').style.color = 'black';
+        }
+        else if (evt.data === 'knowledge_on') {
+          document.getElementById('knowledge_header').style.color = 'orange';
+        }
+        else if (evt.data === 'knowledge_off') {
+          document.getElementById('knowledge_header').style.color = 'black';
+        }
+        else if (evt.data === 'creativity_on') {
+          document.getElementById('creativity_header').style.color = 'purple';
+        }
+        else if (evt.data === 'creativity_off') {
+          document.getElementById('creativity_header').style.color = 'black';
+        }
+
+
+      };
+    }
+    function buttonclick(e) {
+      // @TODO: When the user presses this button (makes selection),
+      //		redirect the user to a new page which
+      //		asks them to submit some thoughts about that
+      //		-- or redirects the user ot the same page
+      //		but lower down with an anchor
+      websock.send(e.id);
+    }
+    function log(msg, log_id) {
+      document.getElementById(log_id).innerText += msg + '\n';
+      console.log(msg);
+    }
+    function submitclick(e) {
+      var user_input;
+      var msg_send;
+      var log_id;
+      totalResponses = totalResponses + 1;
+      if (e.id === "money_send") {
+      	user_input = document.getElementById('money_entry').value;
+    	msg_send = "MON&" + user_input;
+      log_id = "money_log";
+      money.push(user_input); // from SubmitValues()
+      window.alert(money); // from SubmitValues()
+      var moneyQuestion = document.getElementById("money-question"); // from SubmitValues()
+      moneyQuestion.style.visibility = "hidden"; // from SubmitValues()
+      } else if (e.id === "happiness_send") {
+      	user_input = document.getElementById('happiness_entry').value;
+    	msg_send = "HAP&" + user_input;
+    	log_id = "happiness_log";
+      happiness.push(user_input); // from SubmitValues()
+      window.alert(happiness); // from SubmitValues()
+      var happinessQuestion = document.getElementById("happiness-question"); // from SubmitValues()
+      happinessQuestion.style.visibility = "hidden"; // from SubmitValues()
+      } else if (e.id === "innovation_send") {
+      	user_input = document.getElementById('innovation_entry').value;
+    	msg_send = "INN&" + user_input;
+    	log_id = "innovation_log";
+      innovation.push(user_input); // from SubmitValues()
+      window.alert(innovation); // from SubmitValues()
+      var innovationQuestion = document.getElementById("innovation-question"); // from SubmitValues()
+      innovationQuestion.style.visibility = "hidden"; // from SubmitValues()
+      } else if (e.id === "impact_send") {
+      	user_input = document.getElementById('impact_entry').value;
+    	msg_send = "IMP&" + user_input;
+    	log_id = "impact_log";
+      impact.push(user_input); // from SubmitValues()
+      window.alert(impact); // from SubmitValues()
+      var impactQuestion = document.getElementById("impact-question"); // from SubmitValues()
+      impactQuestion.style.visibility = "hidden"; // from SubmitValues()
+      } else if (e.id === "knowledge_send") {
+      	user_input = document.getElementById('knowledge_entry').value;
+    	msg_send = "KNO&" + user_input;
+    	log_id = "knowledge_log";
+      knowledge.push(user_input); // from SubmitValues()
+      window.alert(knowledge); // from SubmitValues()
+      var knowledgeQuestion = document.getElementById("knowledge-question"); // from SubmitValues()
+      knowledgeQuestion.style.visibility = "hidden"; // from SubmitValues()
+      } else if (e.id === "creativity_send") {
+      	user_input = document.getElementById('creativity_entry').value;
+    	msg_send = "CRE&" + user_input;
+    	log_id = "creativity_log";
+      creativity.push(user_input); // from SubmitValues()
+      window.alert(creativity); // from SubmitValues()
+      var creativityQuestion = document.getElementById("creativity-question"); // from SubmitValues()
+      creativityQuestion.style.visibility = "hidden"; // from SubmitValues()
+      }
+      log("Someone wrote: " + user_input, log_id);
+      backToHome();
+      websock.send(msg_send);
+    }
+
+    window.onload = function() {
+        init();
+        reloadBars();
+    }
+
+    function reloadBars() {
+        moneyBar.style.width = Math.round((money.length / totalResponses) * 100) + '%';
+        moneyPercentage.innerHTML = moneyBar.style.width;
+
+        happinessBar.style.width = Math.round((happiness.length / totalResponses) * 100) + '%';
+        happinessPercentage.innerHTML = happinessBar.style.width;
+
+        innovationBar.style.width = Math.round((innovation.length / totalResponses) * 100) + '%';
+        innovationPercentage.innerHTML = innovationBar.style.width;
+        console.log(innovationBar.style.width);
+
+        impactBar.style.width = Math.round((impact.length / totalResponses) * 100) + '%';
+        impactPercentage.innerHTML = impactBar.style.width;
+
+        knowledgeBar.style.width = Math.round((knowledge.length / totalResponses) * 100) + '%';
+        knowledgePercentage.innerHTML = knowledgeBar.style.width;
+
+        creativityBar.style.width = Math.round((creativity.length / totalResponses) * 100) + '%';
+        creativityPercentage.innerHTML = creativityBar.style.width;
+    }
+
+    function init() {
+        money = ["I want to make money","help"];
+        happiness = ["a","b","c"];
+        innovation = ["a"];
+        impact = ["a","b","c","d"];
+        knowledge = ["a","b","c","d","e","f"];
+        creativity = ["a"];
+        totalResponses = money.length + happiness.length + innovation.length + impact.length +
+                            knowledge.length + creativity.length;
+
+        moneyBar = document.getElementById("money-bar");
+        moneyPercentage = document.getElementById("money-percentage");
+
+        happinessBar = document.getElementById("happiness-bar");
+        happinessPercentage = document.getElementById("happiness-percentage");
+
+        innovationBar = document.getElementById("innovation-bar");
+        innovationPercentage = document.getElementById("innovation-percentage");
+
+        impactBar = document.getElementById("impact-bar");
+        impactPercentage = document.getElementById("impact-percentage");
+
+        knowledgeBar = document.getElementById("knowledge-bar");
+        knowledgePercentage = document.getElementById("knowledge-percentage");
+
+        creativityBar = document.getElementById("creativity-bar");
+        creativityPercentage = document.getElementById("creativity-percentage");
+
+        background = document.body;
+    }
+
+    function switchCategory(category) {
+        switch(category) {
+            case money:
+                background.style.visibility = "hidden";
+                background.style.backgroundColor = "#7ED321";
+                var moneyQuestion = document.getElementById("money-question");
+                moneyQuestion.style.visibility = "visible";
+                var innovationQuestion = document.getElementById("innovation-question");
+                innovationQuestion.style.visibility = "hidden";
+                break;
+                console.log(money);
+            case happiness:
+                background.style.visibility = "hidden";
+                background.style.backgroundColor = "#F8E71C";
+                var happinessQuestion = document.getElementById("happiness-question");
+                happinessQuestion.style.visibility = "visible";
+                var happinessQuestion = document.getElementById("happiness-question");
+                break;
+                console.log(happiness);
+            case innovation:
+                background.style.visibility = "hidden";
+                background.style.backgroundColor = "#2DCFF6";
+                var innovationQuestion = document.getElementById("innovation-question");
+                innovationQuestion.style.visibility = "visible";
+                break;
+                console.log(innovation);
+            case impact:
+                background.style.visibility = "hidden";
+                background.style.backgroundColor = "#D0021B";
+                var impactQuestion = document.getElementById("impact-question");
+                impactQuestion.style.visibility = "visible";
+                break;
+                console.log(impact);
+            case knowledge:
+                background.style.visibility = "hidden";
+                background.style.backgroundColor = "#FF7F11";
+                var knowledgeQuestion = document.getElementById("knowledge-question");
+                knowledgeQuestion.style.visibility = "visible";
+                break;
+                console.log(knowledge);
+            case creativity:
+                background.style.visibility = "hidden";
+                background.style.backgroundColor = "#A999FF";
+                var creativityQuestion = document.getElementById("creativity-question");
+                creativityQuestion.style.visibility = "visible";
+                break;
+                console.log(creativity);
+
+        }
+    }
+
+    function submitValues(category) {
+        switch(category) {
+            case money:
+                totalResponses = totalResponses + 1;
+                var response = document.getElementById("money-response");
+                console.log(response.value);
+                money.push(response.value);
+                window.alert(money);
+                var moneyQuestion = document.getElementById("money-question");
+                var div = document.createElement("div");
+                var responseParagraph = document.createElement("p");
+                responseParagraph.innerHTML = response.value;
+                div.appendChild(responseParagraph);
+                document.getElementById("main").appendChild(div);
+                moneyQuestion.style.visibility = "hidden";
+                backToHome();
+                break;
+            case happiness:
+                totalResponses = totalResponses + 1;
+                var response = document.getElementById("happiness-response");
+                console.log(response.value);
+                happiness.push(response.value);
+                window.alert(happiness);
+                var happinessQuestion = document.getElementById("happiness-question");
+                happinessQuestion.style.visibility = "hidden";
+                backToHome();
+                break;
+            case innovation:
+                totalResponses = totalResponses + 1;
+                var response = document.getElementById("innovation-response");
+                console.log(response.value);
+                innovation.push(response.value);
+                window.alert(innovation);
+                var innovationQuestion = document.getElementById("innovation-question");
+                innovationQuestion.style.visibility = "hidden";
+                backToHome();
+                break;
+            case impact:
+                totalResponses = totalResponses + 1;
+                var response = document.getElementById("impact-response");
+                console.log(response.value);
+                impact.push(response.value);
+                window.alert(impact);
+                var impactQuestion = document.getElementById("impact-question");
+                impactQuestion.style.visibility = "hidden";
+                backToHome();
+                break;
+            case knowledge:
+                totalResponses = totalResponses + 1;
+                var response = document.getElementById("knowledge-response");
+                console.log(response.value);
+                knowledge.push(response.value);
+                window.alert(knowledge);
+                var knowledgeQuestion = document.getElementById("knowledge-question");
+                knowledgeQuestion.style.visibility = "hidden";
+                backToHome();
+                break;
+            case creativity:
+                totalResponses = totalResponses + 1;
+                var response = document.getElementById("creativity-response");
+                console.log(response.value);
+                creativity.push(response.value);
+                window.alert(creativity);
+                var creativityQuestion = document.getElementById("creativity-question");
+                creativityQuestion.style.visibility = "hidden";
+                backToHome();
+                break;
+        }
+    }
+
+    function backToHome() {
+        background.style.backgroundColor = "black";
+        reloadBars();
+        background.style.visibility = "visible";
+    }
+    </script>
     <script type="text/javascript" src="scripts/lights.js"></script>
     <meta charset="UTF-8">
 </head>
 <body class="main" id="main">
     <div class="full-width-text title">
-        <h1>WHICH OF THE FOLLOWING IS YOUR GREATEST MOTIVATION FOR PURSUING HIGHER EDUCATION?</h1>
+        <h1>Which of the following is your greatest motivation for pursuing higher education?</h1>
     </div>
     <div class="container">
       <div class="column">
         <a class="item" onclick="switchCategory(money)" href="#">
             <div class="category">
-                <h3 class="categoryButton">MONEY</h3>
+                <h3 class="categoryButton">Money</h3>
                 <div class="money-bar" id="money-bar"></div><p class="percentage" id="money-percentage">0%</p>
             </div>
         </a>
         <a class="item" onclick="switchCategory(happiness)" href="#">
             <div class="category">
-                <h3 class="categoryButton">HAPPINESS</h3>
+                <h3 class="categoryButton">Happiness</h3>
                 <div class="happiness-bar" id="happiness-bar"></div><p class="percentage" id="happiness-percentage">0%</p>
             </div>
         </a>
         <a class="item" onclick="switchCategory(innovation)" href="#">
             <div class="category">
-                <h3 class="categoryButton">INNOVATION</h3>
+                <h3 class="categoryButton">Innovation</h3>
                 <div class="innovation-bar" id="innovation-bar"></div><p class="percentage" id="innovation-percentage">0%</p>
             </div>
         </a>
@@ -35,19 +571,19 @@
       <div class="column">
         <a class="item" onclick="switchCategory(impact)" href="#">
         <div class="category">
-            <h3 class="categoryButton">IMPACT</h3>
+            <h3 class="categoryButton">Impact</h3>
             <div class="impact-bar" id="impact-bar"></div><p class="percentage" id="impact-percentage">0%</p>
         </div>
         </a>
         <a class="item" onclick="switchCategory(knowledge)" href="#">
         <div class="category">
-            <h3 class="categoryButton">KNOWLEDGE</h3>
+            <h3 class="categoryButton">Knowledge</h3>
             <div class="knowledge-bar" id="knowledge-bar"></div><p class="percentage" id="knowledge-percentage">0%</p>
         </div>
         </a>
         <a class="item" onclick="switchCategory(creativity)" href="#">
         <div class="category">
-            <h3 class="categoryButton">CREATIVITY</h3>
+            <h3 class="categoryButton">Creativity</h3>
             <div class="creativity-bar" id="creativity-bar"></div><p class="percentage" id="creativity-percentage">0%</p>
         </div>
         </a>
@@ -55,7 +591,7 @@
     </div>
     <div class="question-container" id="innovation-question">
       <div class="question">
-        <h3 class="subtitle">WHAT IS IT ABOUT INNOVATION THAT DRIVES YOU?</h3>
+        <h3 class="subtitle">What is it about innovation that drive you?</h3>
       </div>
       <div method="post" class="response">
         <button class="white-button" id="innovation_on"  type="button" onclick="buttonclick(this);">On</button>
@@ -74,7 +610,7 @@
 
    <div class="question-container" id="happiness-question">
      <div class="question">
-       <h3 class="subtitle">WHAT IS IT ABOUT HAPPINESS THAT DRIVES YOU?</h3>
+       <h3 class="subtitle">What is it about happiness that drive you?</h3>
      </div>
      <div method="post" class="response">
        <button class="white-button" id="happiness_on"  type="button" onclick="buttonclick(this);">On</button>
@@ -91,7 +627,7 @@
   </div>
     <div class="question-container" id="money-question">
       <div class="question">
-        <h3 class="subtitle">WHAT IS IT ABOUT MONEY THAT DRIVES YOU?</h3>
+        <h3 class="subtitle">What is it about money that drive you?</h3>
       </div>
       <div method="post" class="response">
         <button class="white-button" id="money_on"  type="button" onclick="buttonclick(this);">On</button>
@@ -108,7 +644,7 @@
     </div>
     <div class="question-container" id="impact-question">
       <div class="question">
-        <h3 class="subtitle">WHAT IS IT ABOUT IMPACT THAT DRIVES YOU?</h3>
+        <h3 class="subtitle">What is it about impact that drive you?</h3>
       </div>
       <div method="post" class="response">
         <button class="white-button" id="impact_on"  type="button" onclick="buttonclick(this);">On</button>
@@ -125,7 +661,7 @@
     </div>
     <div class="question-container" id="knowledge-question">
       <div class="question">
-        <h3 class="subtitle">WHAT IS IT ABOUT KNOWLEDGE THAT DRIVES YOU?</h3>
+        <h3 class="subtitle">What is it about knowledge that drive you?</h3>
       </div>
       <div method="post" class="response">
         <button class="white-button" id="knowledge_on"  type="button" onclick="buttonclick(this);">On</button>
@@ -142,7 +678,7 @@
     </div>
     <div class="question-container" id="creativity-question">
       <div class="question">
-        <h3 class="subtitle">WHAT IS IT ABOUT CREATIVITY THAT DRIVES YOU?</h3>
+        <h3 class="subtitle">What is it about creativity that drive you?</h3>
       </div>
       <div method="post" class="response">
         <button class="white-button" id="creativity_on"  type="button" onclick="buttonclick(this);">On</button>
