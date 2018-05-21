@@ -95,6 +95,7 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
           display: inline-block;
           color: white;
           float:left;
+          font-family: Helvetica;
       }
       h1 {
           margin: auto;
