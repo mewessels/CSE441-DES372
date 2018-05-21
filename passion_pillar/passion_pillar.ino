@@ -87,6 +87,13 @@ function start() {
     else if (evt.data === 'knowledge_off') {
       document.getElementById('knowledge_header').style.color = 'black';
     }
+    else if (evt.data === 'creativity_on') {
+      document.getElementById('creativity_header').style.color = 'purple';
+    }
+    else if (evt.data === 'creativity_off') {
+      document.getElementById('creativity_header').style.color = 'black';
+    }
+
 
   };
 }
@@ -126,6 +133,10 @@ function submitclick(e) {
   	user_input = document.getElementById('knowledge_entry').value;
 	msg_send = "KNO&" + user_input;
 	log_id = "knowledge_log";
+  } else if (e.id === "creativity_send") {
+  	user_input = document.getElementById('creativity_entry').value;
+	msg_send = "CRE&" + user_input;
+	log_id = "creativity_log";
   }
 
   log("Someone wrote: " + user_input, log_id);
@@ -176,6 +187,14 @@ function submitclick(e) {
 <input id="knowledge_entry">
 <button id="knowledge_send" onclick="submitclick(this);">Send</button>
 <pre id="knowledge_log"></pre>
+
+<!-- Creativity -->
+<div id="creativity_header"><b>Knowledge</b></div>
+<button id="creativity_on"  type="button" onclick="buttonclick(this);">On</button> 
+<button id="creativity_off" type="button" onclick="buttonclick(this);">Off</button>
+<input id="creativity_entry">
+<button id="creativity_send" onclick="submitclick(this);">Send</button>
+<pre id="creativity_log"></pre>
 
 </body>
 </html>
@@ -263,6 +282,15 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
 			else if (strncmp("KNO", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, KNOWLEDGE);
 			}
+			else if (strcmp("creativity_on", (const char *)payload) == 0) {
+				writeLED(true, CREATIVITY, responses_per_bar[CREATIVITY]++);
+			}
+			else if (strcmp("creativity_off", (const char *)payload) == 0) {
+				writeLED(false, CREATIVITY, NUM_LEDS_PER_BAR);
+			}
+			else if (strncmp("CRE", (const char*)payload, 3) == 0) {
+				process_payload((char*)payload, CREATIVITY);
+			}
 
 			else {
 				Serial.println("Unknown command");
@@ -319,6 +347,8 @@ static void writeLED(bool LEDon, responses selected_bar, uint8_t number_leds_sel
 		led_fill_color = CRGB::Red;	
 	} else if (selected_bar == KNOWLEDGE) {
 		led_fill_color = CRGB::Orange;
+	}  else if (selected_bar == CREATIVITY) {
+		led_fill_color = CRGB::Purple;
 	}
 
 	Serial.print("Selected bar (0 = Money, 1 = Happy, etc.): ");
