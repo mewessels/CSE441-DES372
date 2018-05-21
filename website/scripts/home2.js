@@ -24,10 +24,10 @@ var knowledgePercentage;
 var creativityBar;
 var creativityPercentage;
 
-window.onload = function() {
-    init();
-    reloadBars();
-}
+// window.onload = function() {
+//     init();
+//     reloadBars();
+// }
 
 function reloadBars() {
     moneyBar.style.width = Math.round((money.length / totalResponses) * 100) + '%';
