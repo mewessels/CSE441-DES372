@@ -173,7 +173,7 @@ function submitclick(e) {
 <pre id="innovation_log"></pre>
 
 <!-- Impact -->
-<div id="impact_header"><b>Innovation</b></div>
+<div id="impact_header"><b>Impact</b></div>
 <button id="impact_on"  type="button" onclick="buttonclick(this);">On</button> 
 <button id="impact_off" type="button" onclick="buttonclick(this);">Off</button>
 <input id="impact_entry">
@@ -189,7 +189,7 @@ function submitclick(e) {
 <pre id="knowledge_log"></pre>
 
 <!-- Creativity -->
-<div id="creativity_header"><b>Knowledge</b></div>
+<div id="creativity_header"><b>Creativity</b></div>
 <button id="creativity_on"  type="button" onclick="buttonclick(this);">On</button> 
 <button id="creativity_off" type="button" onclick="buttonclick(this);">Off</button>
 <input id="creativity_entry">
