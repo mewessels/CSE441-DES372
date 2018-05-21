@@ -111,7 +111,7 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
           width: 80%;
       }
       input[type=text] {
-          font-family: futura;
+          font-family: avenir;
           color: white;
           font-size: 24px;
           border: none;
@@ -162,7 +162,7 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
           border-style: solid;
           border-color: white;
           border-width: thick;
-          font-family: futura;
+          font-family: avenir;
       }
 
       .white-button:hover {
@@ -242,7 +242,7 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
           left: 0;
           position: absolute;
           visibility: hidden;
-          font-family: futura;
+          font-family: avenir;
       }
 
       .column {
@@ -737,6 +737,7 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
   </body>
 
   </html>
+
 )rawliteral";
 
 // 0->255 where 255 is max brightness
