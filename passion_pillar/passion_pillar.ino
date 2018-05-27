@@ -49,6 +49,35 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
 "body { background-color: #808080; font-family: Arial, Helvetica, Sans-Serif; Color: #000000; }"
 </style>
 <script>
+
+function log(msg, log_id) {
+  document.getElementById(log_id).innerText += msg + '\n';
+  console.log(msg);
+}
+
+function parse_new_message(msg_header, msg) {
+  switch (msg_header) {
+     case 'MON':
+       log(msg, "money_log");
+       break;
+     case 'HAP':
+       log(msg, "happiness_log");
+       break;
+     case 'INN':
+       log(msg, "innovation_log");
+       break;
+     case 'IMP':
+       log(msg, "impact_log");
+       break;
+     case 'KNO':
+       log(msg, "knowledge_log");
+       break;
+     case 'CRE':
+       log(msg, "creativity_log");
+       break;
+  }
+}
+
 var websock;
 function start() {
   websock = new WebSocket('ws://' + window.location.hostname + ':81/');
@@ -57,88 +86,90 @@ function start() {
   websock.onerror = function(evt) { console.log(evt); };
   websock.onmessage = function(evt) {
     console.log(evt);
-    if (evt.data === 'money_on') {
-      document.getElementById('money_header').style.color = 'green';
+    switch (evt.data) {
+      case 'money_on':
+        document.getElementById('money_header').style.color = 'green';
+        break;
+      case 'money_off':
+        document.getElementById('money_header').style.color = 'black';
+	break;
+      case 'happiness_on':
+        document.getElementById('happiness_header').style.color = 'yellow';
+	break;
+      case 'happiness_off':
+        document.getElementById('happiness_header').style.color = 'black';
+	break;
+      case 'innovation_on':
+        document.getElementById('innovation_header').style.color = 'blue';
+	break;
+      case 'innovation_off':
+        document.getElementById('innovation_header').style.color = 'black';
+	break;
+      case 'impact_on':
+        document.getElementById('impact_header').style.color = 'red';
+	break;
+      case 'impact_off':
+        document.getElementById('impact_header').style.color = 'black';
+	break;
+      case 'knowledge_on':
+        document.getElementById('knowledge_header').style.color = 'orange';
+	break;
+      case 'knowledge_off':
+        document.getElementById('knowledge_header').style.color = 'black';
+	break;
+      case 'creativity_on':
+        document.getElementById('creativity_header').style.color = 'purple';
+	break;
+      case 'creativity_off':
+        document.getElementById('creativity_header').style.color = 'black';
+	break;
+      default:
+        parse_new_message(evt.data.substring(0, 3), evt.data.substring(3, evt.data.length));
+	break;
     }
-    else if (evt.data === 'money_off') {
-      document.getElementById('money_header').style.color = 'black';
-    }
-    else if (evt.data === 'happiness_on') {
-      document.getElementById('happiness_header').style.color = 'yellow';
-    }
-    else if (evt.data === 'happiness_off') {
-      document.getElementById('happiness_header').style.color = 'black';
-    }
-    else if (evt.data === 'innovation_on') {
-      document.getElementById('innovation_header').style.color = 'blue';
-    }
-    else if (evt.data === 'innovation_off') {
-      document.getElementById('innovation_header').style.color = 'black';
-    }
-    else if (evt.data === 'impact_on') {
-      document.getElementById('impact_header').style.color = 'red';
-    }
-    else if (evt.data === 'impact_off') {
-      document.getElementById('impact_header').style.color = 'black';
-    }
-    else if (evt.data === 'knowledge_on') {
-      document.getElementById('knowledge_header').style.color = 'orange';
-    }
-    else if (evt.data === 'knowledge_off') {
-      document.getElementById('knowledge_header').style.color = 'black';
-    }
-    else if (evt.data === 'creativity_on') {
-      document.getElementById('creativity_header').style.color = 'purple';
-    }
-    else if (evt.data === 'creativity_off') {
-      document.getElementById('creativity_header').style.color = 'black';
-    }
-
 
   };
 }
 function buttonclick(e) {
-  // @TODO: When the user presses this button (makes selection),
-  //		redirect the user to a new page which
-  //		asks them to submit some thoughts about that
-  //		-- or redirects the user ot the same page
-  //		but lower down with an anchor
   websock.send(e.id);
-}
-function log(msg, log_id) {
-  document.getElementById(log_id).innerText += msg + '\n';
-  console.log(msg);
 }
 function submitclick(e) {
   var user_input;
   var msg_send;
   var log_id;
-  if (e.id === "money_send") {
-  	user_input = document.getElementById('money_entry').value;
-	msg_send = "MON&" + user_input;
-	log_id = "money_log";
-  } else if (e.id === "happiness_send") {
-  	user_input = document.getElementById('happiness_entry').value;
-	msg_send = "HAP&" + user_input;
-	log_id = "happiness_log";
-  } else if (e.id === "innovation_send") {
-  	user_input = document.getElementById('innovation_entry').value;
-	msg_send = "INN&" + user_input;
-	log_id = "innovation_log";
-  } else if (e.id === "impact_send") {
-  	user_input = document.getElementById('impact_entry').value;
-	msg_send = "IMP&" + user_input;
-	log_id = "impact_log";
-  } else if (e.id === "knowledge_send") {
-  	user_input = document.getElementById('knowledge_entry').value;
-	msg_send = "KNO&" + user_input;
-	log_id = "knowledge_log";
-  } else if (e.id === "creativity_send") {
-  	user_input = document.getElementById('creativity_entry').value;
-	msg_send = "CRE&" + user_input;
-	log_id = "creativity_log";
+  switch (e.id) {
+    case 'money_send':
+      user_input = document.getElementById('money_entry').value;
+      msg_send = "MON&" + user_input;
+      log_id = "money_log";
+      break;
+    case 'happiness_send':
+      user_input = document.getElementById('happiness_entry').value;
+      msg_send = "HAP&" + user_input;
+      log_id = "happiness_log";
+      break;
+    case 'innovation_send':
+      user_input = document.getElementById('innovation_entry').value;
+      msg_send = "INN&" + user_input;
+      log_id = "innovation_log";
+      break;
+    case 'impact_send':
+      user_input = document.getElementById('impact_entry').value;
+      msg_send = "IMP&" + user_input;
+      log_id = "impact_log";
+      break;
+    case 'knowledge_send':
+      user_input = document.getElementById('knowledge_entry').value;
+      msg_send = "KNO&" + user_input;
+      log_id = "knowledge_log";
+      break;
+    case 'creativity_send':
+      user_input = document.getElementById('creativity_entry').value;
+      msg_send = "CRE&" + user_input;
+      log_id = "creativity_log";
+    default:
+      break;
   }
-
   log("Someone wrote: " + user_input, log_id);
   websock.send(msg_send);
 }
