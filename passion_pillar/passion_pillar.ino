@@ -19,7 +19,7 @@ FASTLED_USING_NAMESPACE
 
 CRGB leds[NUM_LEDS];
 
-enum responses { MONEY, HAPPINESS, INNOVATION, IMPACT, KNOWLEDGE, CREATIVITY, MAX_RESPONSES }; 
+enum responses { MONEY, HAPPINESS, INNOVATION, IMPACT, KNOWLEDGE, CREATIVITY, MAX_RESPONSES };
 
 // NUM_LEDS_PER_BAR strings for each option (MONEY, HAPPINESS, etc.) allows user to enter a sentence
 static char user_input[MAX_RESPONSES][NUM_LEDS_PER_BAR][128];
@@ -38,140 +38,241 @@ ESP8266WebServer server(80);
 WebSocketsServer webSocket = WebSocketsServer(81);
 
 static const char PROGMEM INDEX_HTML[] = R"rawliteral(
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Passion Pillar</title>
-    <meta charset="UTF-8">
-</head>
-<body class="main" id="main">
-<style>
-"body { background-color: #808080; font-family: Arial, Helvetica, Sans-Serif; Color: #000000; }"
-</style>
-<script>
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>UW Community Pillar</title>
+    <style>
+    * {
+      font-family: Helvetica;
+    }
 
-function log(msg, log_id) {
-  document.getElementById(log_id).innerText += msg + '\n';
-  console.log(msg);
-}
+    body {
+      background-color: #F1F2F1;
+    }
 
-function parse_new_message(msg_header, msg) {
-  switch (msg_header) {
-     case 'MON':
-       log(msg, "money_log");
-       break;
-     case 'HAP':
-       log(msg, "happiness_log");
-       break;
-     case 'INN':
-       log(msg, "innovation_log");
-       break;
-     case 'IMP':
-       log(msg, "impact_log");
-       break;
-     case 'KNO':
-       log(msg, "knowledge_log");
-       break;
-     case 'CRE':
-       log(msg, "creativity_log");
-       break;
-  }
-}
+    .container {
+      text-align: center;
+    }
 
-var websock;
-function start() {
-  websock = new WebSocket('ws://' + window.location.hostname + ':81/');
-  websock.onopen = function(evt) { console.log('websock open'); };
-  websock.onclose = function(evt) { console.log('websock close'); };
-  websock.onerror = function(evt) { console.log(evt); };
-  websock.onmessage = function(evt) {
-    console.log(evt);
-    parse_new_message(evt.data.substring(0, 3), evt.data.substring(3, evt.data.length));
-  };
-}
-var selected_button;
+    #title {
+      letter-spacing: .20em;
+      font-weight: 600;
+      color: #9A9B9A;
+    }
 
-function buttonclick(e) {
-  selected_button = e.id;
-}
+    h1 {
+      color: #494A49;
+    }
 
-function submitclick(e) {
-  var user_input;
-  var msg_send;
-  var log_id;
-  switch (selected_button) {
-    case 'money':
-      user_input = document.getElementById('entry_field').value;
-      msg_send = "MON&" + user_input;
-      log_id = "money_log";
-      break;
-    case 'happiness':
-      user_input = document.getElementById('entry_field').value;
-      msg_send = "HAP&" + user_input;
-      log_id = "happiness_log";
-      break;
-    case 'innovation':
-      user_input = document.getElementById('entry_field').value;
-      msg_send = "INN&" + user_input;
-      log_id = "innovation_log";
-      break;
-    case 'impact':
-      user_input = document.getElementById('entry_field').value;
-      msg_send = "IMP&" + user_input;
-      log_id = "impact_log";
-      break;
-    case 'knowledge':
-      user_input = document.getElementById('entry_field').value;
-      msg_send = "KNO&" + user_input;
-      log_id = "knowledge_log";
-      break;
-    case 'creativity':
-      user_input = document.getElementById('entry_field').value;
-      msg_send = "CRE&" + user_input;
-      log_id = "creativity_log";
-      break;
-    default:
-      alert("Please select an answer before submitting");
-      break;
-  }
-  websock.send(msg_send);
-  websock.send(selected_button);
-}
-</script>
-</head>
-<body onload="javascript:start();">
-<h1>Passion Pillar</h1>
-<h2>What drives you?</h2>
+    .column {
+      float: left;
+      width: 50%;
+      margin-top: 2%;
+      margin-bottom: 2%;
+    }
 
-<!-- Money -->
-<button id="money"  type="button" onclick="buttonclick(this);">Money</button> 
-<pre id="money_log"></pre>
+    input[type="radio"] {
+      position:fixed;
+      opacity:0;
+    }
 
-<!-- Happiness -->
-<button id="happiness"  type="button" onclick="buttonclick(this);">Happiness</button> 
-<pre id="happiness_log"></pre>
+    .button {
+      font-size: 2em;
+      font-weight: bold;
+      background-color: white;
+      border-style: solid;
+      border-color: white;
+      border-width: thick;
+      border-radius: 50px;
+      padding-top: 4%;
+      padding-bottom: 4%;
+      margin-bottom: 5%;
+      margin-left: 18%;
+      margin-right: 18%;
+    }
 
-<!-- Innovation -->
-<button id="innovation"  type="button" onclick="buttonclick(this);">Innovation</button> 
-<pre id="innovation_log"></pre>
+    #money_button {color: #7BD400;}
+    #innovation_button {color: #17CEF8;}
+    #knowledge_button {color: #F6A602;}
+    #creativity_button {color: #A896FF;}
+    #impact_button {color: #F18674;}
+    #happiness_button {color: #FFD43B;}
+    :checked + #money_button {border-color: #7BD400;}
+    :checked + #innovation_button {border-color: #17CEF8;}
+    :checked + #knowledge_button {border-color: #F6A602;}
+    :checked + #creativity_button {border-color: #A896FF;}
+    :checked + #impact_button {border-color: #F18674;}
+    :checked + #happiness_button {border-color: #FFD43B;}
 
-<!-- Impact -->
-<button id="impact"  type="button" onclick="buttonclick(this);">Impact</button> 
-<pre id="impact_log"></pre>
+    textarea {
+      resize: none;
+      width: 60%;
+      font-size: 1.2em;
+      font-weight: lighter;
+      border-color: #D8D7D7;
+      border-radius: 5px;
+      padding: 1.5%;
+    }
 
-<!-- Knowledge -->
-<button id="knowledge"  type="button" onclick="buttonclick(this);">Knowledge</button> 
-<pre id="knowledge_log"></pre>
+    input[type="submit"] {
+      color: #999A99;
+      font-size: 1em;
+      font-weight: bold;
+      background-color: white;
+      border-color: white;
+      border-style: solid;
+      border-radius: 50px;
+      padding-top: 1%;
+      padding-bottom: 1%;
+      padding-left: 3%;
+      padding-right: 3%;
+      margin-top: 2%;
+      position: relative;
+      left: 25%;
+    }
 
-<!-- Creativity -->
-<button id="creativity"  type="button" onclick="buttonclick(this);">Creativity</button> 
-<pre id="creativity_log"></pre>
-
-<input id="entry_field">
-<button id="entry_send" onclick="submitclick(this);">Send</button>
-
-</body>
-</html>
+    input[type="submit"]:hover {
+      background-color: #D8D7D7;
+      border-color: #D8D7D7;
+    }
+    </style>
+    <script>
+    function log(msg, log_id) {
+      document.getElementById(log_id).innerText += msg + '\n';
+      console.log(msg);
+    }
+    function parse_new_message(msg_header, msg) {
+      switch (msg_header) {
+        case 'MON':
+        log(msg, "money_log");
+        break;
+        case 'HAP':
+        log(msg, "happiness_log");
+        break;
+        case 'INN':
+        log(msg, "innovation_log");
+        break;
+        case 'IMP':
+        log(msg, "impact_log");
+        break;
+        case 'KNO':
+        log(msg, "knowledge_log");
+        break;
+        case 'CRE':
+        log(msg, "creativity_log");
+        break;
+      }
+    }
+    var websock;
+    function start() {
+      websock = new WebSocket('ws://' + window.location.hostname + ':81/');
+      websock.onopen = function(evt) { console.log('websock open'); };
+      websock.onclose = function(evt) { console.log('websock close'); };
+      websock.onerror = function(evt) { console.log(evt); };
+      websock.onmessage = function(evt) {
+        console.log(evt);
+        parse_new_message(evt.data.substring(0, 3), evt.data.substring(3, evt.data.length));
+      };
+    }
+    var selected_button;
+    function buttonclick(e) {
+      selected_button = e.id;
+    }
+    function submitclick(e) {
+      var user_input;
+      var msg_send;
+      var log_id;
+      switch (selected_button) {
+        case 'money':
+        user_input = document.getElementById('entry_field').value;
+        msg_send = "MON&" + user_input;
+        log_id = "money_log";
+        break;
+        case 'happiness':
+        user_input = document.getElementById('entry_field').value;
+        msg_send = "HAP&" + user_input;
+        log_id = "happiness_log";
+        break;
+        case 'innovation':
+        user_input = document.getElementById('entry_field').value;
+        msg_send = "INN&" + user_input;
+        log_id = "innovation_log";
+        break;
+        case 'impact':
+        user_input = document.getElementById('entry_field').value;
+        msg_send = "IMP&" + user_input;
+        log_id = "impact_log";
+        break;
+        case 'knowledge':
+        user_input = document.getElementById('entry_field').value;
+        msg_send = "KNO&" + user_input;
+        log_id = "knowledge_log";
+        break;
+        case 'creativity':
+        user_input = document.getElementById('entry_field').value;
+        msg_send = "CRE&" + user_input;
+        log_id = "creativity_log";
+        break;
+        default:
+        alert("Please select an answer before submitting");
+        break;
+      }
+      websock.send(msg_send);
+      websock.send(selected_button);
+    }
+    </script>
+  </head>
+  <body onload="javascript:start();">
+    <div class="container" id="header">
+      <p id="title">UW COMMUNITY PILLAR</p>
+      <h1>What drives you most as a student at UW?</h1>
+    </div>
+    <div class="container" id="form">
+      <form>
+        <div class="column">
+          <label class="test">
+            <input type="radio" name="category" id="money" onclick="buttonclick(this);"/>
+            <div class="button" id="money_button">Money</div>
+          </label>
+          <pre id="money_log"></pre>
+          <label class="test">
+            <input type="radio" name="category" id="innovation" onclick="buttonclick(this);"/>
+            <div class="button" id="innovation_button">Innovation</div>
+          </label>
+          <pre id="innovation_log"></pre>
+          <label class="test">
+            <input type="radio" name="category" id="knowledge" onclick="buttonclick(this);"/>
+            <div class="button" id="knowledge_button">Knowledge</div>
+          </label>
+          <pre id="knowledge_log"></pre>
+        </div>
+        <div class="column">
+          <label class="test">
+            <input type="radio" name="category" id="creativity" onclick="buttonclick(this);"/>
+            <div class="button" id="creativity_button">Creativity</div>
+          </label>
+          <pre id="creativity_log"></pre>
+          <label class="test">
+            <input type="radio" name="category" id="impact" onclick="buttonclick(this);"/>
+            <div class="button" id="impact_button">Impact</div>
+          </label>
+          <pre id="impact_log"></pre>
+          <label class="test">
+            <input type="radio" name="category" id="happiness" onclick="buttonclick(this);"/>
+            <div class="button" id="happiness_button">Happiness</div>
+          </label>
+          <pre id="happiness_log"></pre>
+        </div>
+        <textarea id="entry_field" rows="5" cols="50" placeholder="Tell us why!"></textarea>
+        <div id="submit">
+          <input id="entry_send" onclick="submitclick(this);" type="submit" value="Submit">
+        </div>
+      </form>
+    </div>
+  </body>
+  </html>
 )rawliteral";
 
 // 0->255 where 255 is max brightness
@@ -288,16 +389,16 @@ void handleNotFound()
 static void writeLED(bool LEDon, responses selected_bar, uint8_t number_leds_selected)
 {
 	LEDStatus = LEDon;
-	CRGB led_fill_color = CRGB::Black;	
+	CRGB led_fill_color = CRGB::Black;
 
 	if (selected_bar == MONEY) {
-		led_fill_color = CRGB::Green;	
+		led_fill_color = CRGB::Green;
 	} else if (selected_bar == HAPPINESS) {
 		led_fill_color = CRGB::Yellow;
 	} else if (selected_bar == INNOVATION) {
-		led_fill_color = CRGB::Blue;	
+		led_fill_color = CRGB::Blue;
 	} else if (selected_bar == IMPACT) {
-		led_fill_color = CRGB::Red;	
+		led_fill_color = CRGB::Red;
 	} else if (selected_bar == KNOWLEDGE) {
 		led_fill_color = CRGB::Orange;
 	}  else if (selected_bar == CREATIVITY) {
