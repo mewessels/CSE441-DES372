@@ -24,7 +24,7 @@ enum responses { MONEY, HAPPINESS, INNOVATION, IMPACT, KNOWLEDGE, CREATIVITY, MA
 // NUM_LEDS_PER_BAR strings for each option (MONEY, HAPPINESS, etc.) allows user to enter a sentence
 static char user_input[MAX_RESPONSES][NUM_LEDS_PER_BAR][128];
 
-static uint8_t responses_per_bar[] = {0,0,0,0,0,0};
+static uint8_t responses_per_bar[] = {1,1,1,1,1,1};
 
 static const char ssid[] = "Passion Pillar";
 static const char password[] = "";
@@ -49,6 +49,35 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
 "body { background-color: #808080; font-family: Arial, Helvetica, Sans-Serif; Color: #000000; }"
 </style>
 <script>
+
+function log(msg, log_id) {
+  document.getElementById(log_id).innerText += msg + '\n';
+  console.log(msg);
+}
+
+function parse_new_message(msg_header, msg) {
+  switch (msg_header) {
+     case 'MON':
+       log(msg, "money_log");
+       break;
+     case 'HAP':
+       log(msg, "happiness_log");
+       break;
+     case 'INN':
+       log(msg, "innovation_log");
+       break;
+     case 'IMP':
+       log(msg, "impact_log");
+       break;
+     case 'KNO':
+       log(msg, "knowledge_log");
+       break;
+     case 'CRE':
+       log(msg, "creativity_log");
+       break;
+  }
+}
+
 var websock;
 function start() {
   websock = new WebSocket('ws://' + window.location.hostname + ':81/');
@@ -57,90 +86,56 @@ function start() {
   websock.onerror = function(evt) { console.log(evt); };
   websock.onmessage = function(evt) {
     console.log(evt);
-    if (evt.data === 'money_on') {
-      document.getElementById('money_header').style.color = 'green';
-    }
-    else if (evt.data === 'money_off') {
-      document.getElementById('money_header').style.color = 'black';
-    }
-    else if (evt.data === 'happiness_on') {
-      document.getElementById('happiness_header').style.color = 'yellow';
-    }
-    else if (evt.data === 'happiness_off') {
-      document.getElementById('happiness_header').style.color = 'black';
-    }
-    else if (evt.data === 'innovation_on') {
-      document.getElementById('innovation_header').style.color = 'blue';
-    }
-    else if (evt.data === 'innovation_off') {
-      document.getElementById('innovation_header').style.color = 'black';
-    }
-    else if (evt.data === 'impact_on') {
-      document.getElementById('impact_header').style.color = 'red';
-    }
-    else if (evt.data === 'impact_off') {
-      document.getElementById('impact_header').style.color = 'black';
-    }
-    else if (evt.data === 'knowledge_on') {
-      document.getElementById('knowledge_header').style.color = 'orange';
-    }
-    else if (evt.data === 'knowledge_off') {
-      document.getElementById('knowledge_header').style.color = 'black';
-    }
-    else if (evt.data === 'creativity_on') {
-      document.getElementById('creativity_header').style.color = 'purple';
-    }
-    else if (evt.data === 'creativity_off') {
-      document.getElementById('creativity_header').style.color = 'black';
-    }
-
-
+    parse_new_message(evt.data.substring(0, 3), evt.data.substring(3, evt.data.length));
   };
 }
+var selected_button;
+
 function buttonclick(e) {
-  // @TODO: When the user presses this button (makes selection),
-  //		redirect the user to a new page which
-  //		asks them to submit some thoughts about that
-  //		-- or redirects the user ot the same page
-  //		but lower down with an anchor
-  websock.send(e.id);
+  selected_button = e.id;
 }
-function log(msg, log_id) {
-  document.getElementById(log_id).innerText += msg + '\n';
-  console.log(msg);
-}
+
 function submitclick(e) {
   var user_input;
   var msg_send;
   var log_id;
-  if (e.id === "money_send") {
-  	user_input = document.getElementById('money_entry').value;
-	msg_send = "MON&" + user_input;
-	log_id = "money_log";
-  } else if (e.id === "happiness_send") {
-  	user_input = document.getElementById('happiness_entry').value;
-	msg_send = "HAP&" + user_input;
-	log_id = "happiness_log";
-  } else if (e.id === "innovation_send") {
-  	user_input = document.getElementById('innovation_entry').value;
-	msg_send = "INN&" + user_input;
-	log_id = "innovation_log";
-  } else if (e.id === "impact_send") {
-  	user_input = document.getElementById('impact_entry').value;
-	msg_send = "IMP&" + user_input;
-	log_id = "impact_log";
-  } else if (e.id === "knowledge_send") {
-  	user_input = document.getElementById('knowledge_entry').value;
-	msg_send = "KNO&" + user_input;
-	log_id = "knowledge_log";
-  } else if (e.id === "creativity_send") {
-  	user_input = document.getElementById('creativity_entry').value;
-	msg_send = "CRE&" + user_input;
-	log_id = "creativity_log";
+  switch (selected_button) {
+    case 'money':
+      user_input = document.getElementById('entry_field').value;
+      msg_send = "MON&" + user_input;
+      log_id = "money_log";
+      break;
+    case 'happiness':
+      user_input = document.getElementById('entry_field').value;
+      msg_send = "HAP&" + user_input;
+      log_id = "happiness_log";
+      break;
+    case 'innovation':
+      user_input = document.getElementById('entry_field').value;
+      msg_send = "INN&" + user_input;
+      log_id = "innovation_log";
+      break;
+    case 'impact':
+      user_input = document.getElementById('entry_field').value;
+      msg_send = "IMP&" + user_input;
+      log_id = "impact_log";
+      break;
+    case 'knowledge':
+      user_input = document.getElementById('entry_field').value;
+      msg_send = "KNO&" + user_input;
+      log_id = "knowledge_log";
+      break;
+    case 'creativity':
+      user_input = document.getElementById('entry_field').value;
+      msg_send = "CRE&" + user_input;
+      log_id = "creativity_log";
+      break;
+    default:
+      alert("Please select an answer before submitting");
+      break;
   }
-
-  log("Someone wrote: " + user_input, log_id);
   websock.send(msg_send);
+  websock.send(selected_button);
 }
 </script>
 </head>
@@ -149,52 +144,31 @@ function submitclick(e) {
 <h2>What drives you?</h2>
 
 <!-- Money -->
-<div id="money_header"><b>Money</b></div>
-<button id="money_on"  type="button" onclick="buttonclick(this);">On</button> 
-<button id="money_off" type="button" onclick="buttonclick(this);">Off</button>
-<input id="money_entry">
-<button id="money_send" onclick="submitclick(this);">Send</button>
+<button id="money"  type="button" onclick="buttonclick(this);">Money</button> 
 <pre id="money_log"></pre>
 
 <!-- Happiness -->
-<div id="happiness_header"><b>Happiness</b></div>
-<button id="happiness_on"  type="button" onclick="buttonclick(this);">On</button> 
-<button id="happiness_off" type="button" onclick="buttonclick(this);">Off</button>
-<input id="happiness_entry">
-<button id="happiness_send" onclick="submitclick(this);">Send</button>
+<button id="happiness"  type="button" onclick="buttonclick(this);">Happiness</button> 
 <pre id="happiness_log"></pre>
 
 <!-- Innovation -->
-<div id="innovation_header"><b>Innovation</b></div>
-<button id="innovation_on"  type="button" onclick="buttonclick(this);">On</button> 
-<button id="innovation_off" type="button" onclick="buttonclick(this);">Off</button>
-<input id="innovation_entry">
-<button id="innovation_send" onclick="submitclick(this);">Send</button>
+<button id="innovation"  type="button" onclick="buttonclick(this);">Innovation</button> 
 <pre id="innovation_log"></pre>
 
 <!-- Impact -->
-<div id="impact_header"><b>Impact</b></div>
-<button id="impact_on"  type="button" onclick="buttonclick(this);">On</button> 
-<button id="impact_off" type="button" onclick="buttonclick(this);">Off</button>
-<input id="impact_entry">
-<button id="impact_send" onclick="submitclick(this);">Send</button>
+<button id="impact"  type="button" onclick="buttonclick(this);">Impact</button> 
 <pre id="impact_log"></pre>
 
 <!-- Knowledge -->
-<div id="knowledge_header"><b>Knowledge</b></div>
-<button id="knowledge_on"  type="button" onclick="buttonclick(this);">On</button> 
-<button id="knowledge_off" type="button" onclick="buttonclick(this);">Off</button>
-<input id="knowledge_entry">
-<button id="knowledge_send" onclick="submitclick(this);">Send</button>
+<button id="knowledge"  type="button" onclick="buttonclick(this);">Knowledge</button> 
 <pre id="knowledge_log"></pre>
 
 <!-- Creativity -->
-<div id="creativity_header"><b>Creativity</b></div>
-<button id="creativity_on"  type="button" onclick="buttonclick(this);">On</button> 
-<button id="creativity_off" type="button" onclick="buttonclick(this);">Off</button>
-<input id="creativity_entry">
-<button id="creativity_send" onclick="submitclick(this);">Send</button>
+<button id="creativity"  type="button" onclick="buttonclick(this);">Creativity</button> 
 <pre id="creativity_log"></pre>
+
+<input id="entry_field">
+<button id="entry_send" onclick="submitclick(this);">Send</button>
 
 </body>
 </html>
@@ -229,64 +203,43 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
 				if (LEDStatus) {
 					webSocket.sendTXT(num, "money_on", 8);
 				}
-				else {
-					webSocket.sendTXT(num, "money_off", 9);
-				}
 			}
 			break;
 		case WStype_TEXT:
 			Serial.printf("[%u] get Text: %s\r\n", num, payload);
 
-			if (strcmp("money_on", (const char *)payload) == 0) {
+			if (strcmp("money", (const char *)payload) == 0) {
 				writeLED(true, MONEY, responses_per_bar[MONEY]++);
-			}
-			else if (strcmp("money_off", (const char *)payload) == 0) {
-				writeLED(false, MONEY, NUM_LEDS_PER_BAR);
 			}
 			else if (strncmp("MON", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, MONEY);
 			}
-			else if (strcmp("happiness_on", (const char *)payload) == 0) {
+			else if (strcmp("happiness", (const char *)payload) == 0) {
 				writeLED(true, HAPPINESS, responses_per_bar[HAPPINESS]++);
-			}
-			else if (strcmp("happiness_off", (const char *)payload) == 0) {
-				writeLED(false, HAPPINESS, NUM_LEDS_PER_BAR);
 			}
 			else if (strncmp("HAP", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, HAPPINESS);
 			}
-			else if (strcmp("innovation_on", (const char *)payload) == 0) {
+			else if (strcmp("innovation", (const char *)payload) == 0) {
 				writeLED(true, INNOVATION, responses_per_bar[INNOVATION]++);
-			}
-			else if (strcmp("innovation_off", (const char *)payload) == 0) {
-				writeLED(false, INNOVATION, NUM_LEDS_PER_BAR);
 			}
 			else if (strncmp("INN", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, INNOVATION);
 			}
-			else if (strcmp("impact_on", (const char *)payload) == 0) {
+			else if (strcmp("impact", (const char *)payload) == 0) {
 				writeLED(true, IMPACT, responses_per_bar[IMPACT]++);
-			}
-			else if (strcmp("impact_off", (const char *)payload) == 0) {
-				writeLED(false, IMPACT, NUM_LEDS_PER_BAR);
 			}
 			else if (strncmp("IMP", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, IMPACT);
 			}
-			else if (strcmp("knowledge_on", (const char *)payload) == 0) {
+			else if (strcmp("knowledge", (const char *)payload) == 0) {
 				writeLED(true, KNOWLEDGE, responses_per_bar[KNOWLEDGE]++);
-			}
-			else if (strcmp("knowledge_off", (const char *)payload) == 0) {
-				writeLED(false, KNOWLEDGE, NUM_LEDS_PER_BAR);
 			}
 			else if (strncmp("KNO", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, KNOWLEDGE);
 			}
-			else if (strcmp("creativity_on", (const char *)payload) == 0) {
+			else if (strcmp("creativity", (const char *)payload) == 0) {
 				writeLED(true, CREATIVITY, responses_per_bar[CREATIVITY]++);
-			}
-			else if (strcmp("creativity_off", (const char *)payload) == 0) {
-				writeLED(false, CREATIVITY, NUM_LEDS_PER_BAR);
 			}
 			else if (strncmp("CRE", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, CREATIVITY);
