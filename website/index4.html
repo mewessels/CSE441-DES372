@@ -76,7 +76,7 @@
     padding: 1.5%;
   }
 
-  input[type="submit"] {
+  #entry_send {
     color: #999A99;
     font-size: 1em;
     font-weight: bold;
@@ -93,7 +93,7 @@
     left: 25%;
   }
 
-  input[type="submit"]:hover {
+  #entry_send:hover {
     background-color: #D8D7D7;
     border-color: #D8D7D7;
   }
@@ -181,6 +181,7 @@
     }
     websock.send(msg_send);
     websock.send(selected_button);
+    document.getElementById("entry_form").reset();
   }
   </script>
 </head>
@@ -190,7 +191,7 @@
     <h1>What drives you most as a student at UW?</h1>
   </div>
   <div class="container" id="form">
-    <form>
+    <form id="entry_form">
       <div class="column">
         <label class="test">
           <input type="radio" name="category" id="money" onclick="buttonclick(this);"/>
@@ -227,7 +228,8 @@
       </div>
       <textarea id="entry_field" rows="5" cols="50" placeholder="Tell us why!"></textarea>
       <div id="submit">
-        <input id="entry_send" onclick="submitclick(this);" type="submit" value="Submit">
+        <button id="entry_send" onclick="submitclick(this);" type='button' value="Submit">Submit</button>
+        <!-- <input id="entry_send" onclick="submitclick(this);" type="submit" value="Submit"> -->
       </div>
     </form>
   </div>
