@@ -30,7 +30,7 @@ static const char ssid[] = "Passion Pillar";
 static const char password[] = "";
 MDNSResponder mdns;
 
-static void writeLED(responses selected_bar, float number_responses);
+static void writeLED(uint8_t selected_bar, float number_responses);
 
 ESP8266WiFiMulti WiFiMulti;
 
@@ -141,10 +141,18 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
       border-color: #D8D7D7;
     }
 
-    #switch {
+    #switch_page {
       position: absolute;
       top: 0;
       right: 0;
+      width: 25px;
+      height: 25px;
+    }
+    
+    #reset_switch {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 25px;
       height: 25px;
     }
@@ -287,11 +295,17 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
         responses.style.display = "block";
       }
     }
+
+    function resetLEDs() {
+      console.log('reset LEDs');
+      websock.send("reset");
+    }
     </script>
   </head>
   <body onload="javascript:start();">
     <p id="title">UW COMMUNITY PILLAR</p>
-    <span id="switch" onclick="switchPages()"></span>
+    <span id="switch_page" onclick="switchPages()"></span>
+    <span id="reset_switch" onclick="resetLEDs()"></span>
     <div id="prompt">
       <div class="container" id="header">
         <h1>What drives you most as a student at UW?</h1>
@@ -336,29 +350,29 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
     <div id="responses">
       <h1>Here's what others have said:</h1>
       <div id="log">
-        <div class="message__bubble">
+        <!--<div class="message__bubble">
           <div class="money message__category">money</div>
-          <div class="message__text">fdsafdsafdas</div>
+          <div class="message__text">I like money because it lets me hang out with friends.</div>
         </div>
-        <div class="message__bubble">
+        <!--<div class="message__bubble">
           <div class="happiness message__category">happiness</div>
-          <div class="message__text">Lorem ipsum dolor sit amet, Lorem ipsum dolor sit amet</div>
+          <div class="message__text">Smile everyday!</div>-->
         </div>
-        <div class="message__bubble">
+        <!--<div class="message__bubble">
           <div class="knowledge message__category">knowledge</div>
-          <div class="message__text">fdsafasdfasd</div>
+          <div class="message__text">Knowledge = Power</div>-->
         </div>
-        <div class="message__bubble">
-          <div class="impact message__category">knowledge</div>
-          <div class="message__text">Lorem ipsum dolor sit amet, Lorem ipsum dolor sit amet</div>
+        <!--<div class="message__bubble">
+          <div class="impact message__category">impact</div>
+          <div class="message__text">I want to make an impact with my life to give back to those who had an impact on me.</div>-->
         </div>
-        <div class="message__bubble">
-          <div class="creativity message__category">knowledge</div>
-          <div class="message__text">fdsafasdfasd</div>
+        <!--<div class="message__bubble">
+          <div class="creativity message__category">creativity</div>
+          <div class="message__text">Making things is awesome!</div>-->
         </div>
-        <div class="message__bubble">
-          <div class="innovation message__category">knowledge</div>
-          <div class="message__text">Lorem ipsum dolor sit amet, Lorem ipsum dolor sit amet</div>
+        <!--<div class="message__bubble">
+          <div class="innovation message__category">innovation</div>
+          <div class="message__text">We should always be innovating.</div>-->
         </div>
       </div>
     </div>
@@ -380,8 +394,23 @@ void process_payload(char* payload, responses selection) {
 	strcpy(user_input[selection][responses_per_bar[selection]], split);
 }
 
+float total_responses = 0;
+
+static void update_LED_strip(void) {
+  CRGB led_fill_color = CRGB::Black;
+  
+  // reset the LED strip
+  fill_solid(leds, NUM_LEDS, led_fill_color);
+  FastLED.show();
+  
+  for (int response = MONEY; response < MAX_RESPONSES; response++) {
+    writeLED(response, responses_per_bar[response]);
+  }
+}
+
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
 {
+  bool need_to_update_strip = false;
 	Serial.printf("webSocketEvent(%d, %d, ...)\r\n", num, type);
 	switch (type) {
 		case WStype_DISCONNECTED:
@@ -401,45 +430,59 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
 			Serial.printf("[%u] get Text: %s\r\n", num, payload);
 
 			if (strcmp("money", (const char *)payload) == 0) {
-				writeLED(MONEY, ++responses_per_bar[MONEY]);
+				responses_per_bar[MONEY]++;
+        need_to_update_strip = true;
 			}
 			else if (strncmp("MON", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, MONEY);
 			}
 			else if (strcmp("happiness", (const char *)payload) == 0) {
-				writeLED(HAPPINESS, ++responses_per_bar[HAPPINESS]);
+				responses_per_bar[HAPPINESS]++;
+        need_to_update_strip = true;
 			}
 			else if (strncmp("HAP", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, HAPPINESS);
 			}
 			else if (strcmp("innovation", (const char *)payload) == 0) {
-				writeLED(INNOVATION, ++responses_per_bar[INNOVATION]);
+				responses_per_bar[INNOVATION]++;
+        need_to_update_strip = true;
 			}
 			else if (strncmp("INN", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, INNOVATION);
 			}
 			else if (strcmp("impact", (const char *)payload) == 0) {
-				writeLED(IMPACT, ++responses_per_bar[IMPACT]);
+				responses_per_bar[IMPACT]++;
+        need_to_update_strip = true;
 			}
 			else if (strncmp("IMP", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, IMPACT);
 			}
 			else if (strcmp("knowledge", (const char *)payload) == 0) {
-				writeLED(KNOWLEDGE, ++responses_per_bar[KNOWLEDGE]);
+				responses_per_bar[KNOWLEDGE]++;
+        need_to_update_strip = true;
 			}
 			else if (strncmp("KNO", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, KNOWLEDGE);
 			}
 			else if (strcmp("creativity", (const char *)payload) == 0) {
-				writeLED(CREATIVITY, ++responses_per_bar[CREATIVITY]);
+				responses_per_bar[CREATIVITY]++;
+        need_to_update_strip = true;
 			}
 			else if (strncmp("CRE", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, CREATIVITY);
 			}
-
+      else if (strncmp("reset", (const char *)payload, 5) == 0) {
+        update_LED_strip();
+      }
 			else {
 				Serial.println("Unknown command");
 			}
+
+      if (need_to_update_strip) {
+        total_responses++;
+        update_LED_strip();
+      }
+      
 			// send data to all connected clients
 			webSocket.broadcastTXT(payload, length);
 			break;
@@ -477,12 +520,10 @@ void handleNotFound()
 	server.send(404, "text/plain", message);
 }
 
-float total_responses = 0;
-
-static void writeLED(responses selected_bar, float number_responses)
+static void writeLED(uint8_t selected_bar, float number_responses)
 {
 	CRGB led_fill_color = CRGB::Black;
-
+  
 	if (selected_bar == MONEY) {
 		led_fill_color = CRGB::Green;
 	} else if (selected_bar == HAPPINESS) {
@@ -497,7 +538,6 @@ static void writeLED(responses selected_bar, float number_responses)
 		led_fill_color = CRGB::Purple;
 	}
 
-  total_responses = total_responses + 1;
   uint8_t number_leds_to_light = round((number_responses/total_responses) * NUM_LEDS_PER_BAR);
 
   Serial.print("number_responses_for_category = ");
