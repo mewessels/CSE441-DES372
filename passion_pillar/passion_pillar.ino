@@ -19,18 +19,18 @@ FASTLED_USING_NAMESPACE
 
 CRGB leds[NUM_LEDS];
 
-enum responses { MONEY, HAPPINESS, INNOVATION, IMPACT, KNOWLEDGE, CREATIVITY, MAX_RESPONSES };
+enum responses { MONEY, INNOVATION, KNOWLEDGE, CREATIVITY, IMPACT, HAPPINESS, MAX_RESPONSES };
 
 // NUM_LEDS_PER_BAR strings for each option (MONEY, HAPPINESS, etc.) allows user to enter a sentence
 static char user_input[MAX_RESPONSES][NUM_LEDS_PER_BAR][128];
 
-static uint8_t responses_per_bar[] = {1,1,1,1,1,1};
+static uint8_t responses_per_bar[] = {0,0,0,0,0,0};
 
 static const char ssid[] = "Passion Pillar";
 static const char password[] = "";
 MDNSResponder mdns;
 
-static void writeLED(bool LEDon, responses selected_bar, uint8_t number_leds_selected);
+static void writeLED(responses selected_bar, float number_responses);
 
 ESP8266WiFiMulti WiFiMulti;
 
@@ -401,37 +401,37 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
 			Serial.printf("[%u] get Text: %s\r\n", num, payload);
 
 			if (strcmp("money", (const char *)payload) == 0) {
-				writeLED(true, MONEY, responses_per_bar[MONEY]++);
+				writeLED(MONEY, ++responses_per_bar[MONEY]);
 			}
 			else if (strncmp("MON", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, MONEY);
 			}
 			else if (strcmp("happiness", (const char *)payload) == 0) {
-				writeLED(true, HAPPINESS, responses_per_bar[HAPPINESS]++);
+				writeLED(HAPPINESS, ++responses_per_bar[HAPPINESS]);
 			}
 			else if (strncmp("HAP", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, HAPPINESS);
 			}
 			else if (strcmp("innovation", (const char *)payload) == 0) {
-				writeLED(true, INNOVATION, responses_per_bar[INNOVATION]++);
+				writeLED(INNOVATION, ++responses_per_bar[INNOVATION]);
 			}
 			else if (strncmp("INN", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, INNOVATION);
 			}
 			else if (strcmp("impact", (const char *)payload) == 0) {
-				writeLED(true, IMPACT, responses_per_bar[IMPACT]++);
+				writeLED(IMPACT, ++responses_per_bar[IMPACT]);
 			}
 			else if (strncmp("IMP", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, IMPACT);
 			}
 			else if (strcmp("knowledge", (const char *)payload) == 0) {
-				writeLED(true, KNOWLEDGE, responses_per_bar[KNOWLEDGE]++);
+				writeLED(KNOWLEDGE, ++responses_per_bar[KNOWLEDGE]);
 			}
 			else if (strncmp("KNO", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, KNOWLEDGE);
 			}
 			else if (strcmp("creativity", (const char *)payload) == 0) {
-				writeLED(true, CREATIVITY, responses_per_bar[CREATIVITY]++);
+				writeLED(CREATIVITY, ++responses_per_bar[CREATIVITY]);
 			}
 			else if (strncmp("CRE", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, CREATIVITY);
@@ -477,9 +477,10 @@ void handleNotFound()
 	server.send(404, "text/plain", message);
 }
 
-static void writeLED(bool LEDon, responses selected_bar, uint8_t number_leds_selected)
+float total_responses = 0;
+
+static void writeLED(responses selected_bar, float number_responses)
 {
-	LEDStatus = LEDon;
 	CRGB led_fill_color = CRGB::Black;
 
 	if (selected_bar == MONEY) {
@@ -496,28 +497,27 @@ static void writeLED(bool LEDon, responses selected_bar, uint8_t number_leds_sel
 		led_fill_color = CRGB::Purple;
 	}
 
+  total_responses = total_responses + 1;
+  uint8_t number_leds_to_light = round((number_responses/total_responses) * NUM_LEDS_PER_BAR);
+
+  Serial.print("number_responses_for_category = ");
+  Serial.println(number_responses);
+  Serial.print("total_responses = ");
+  Serial.println(total_responses);
+
 	Serial.print("Selected bar (0 = Money, 1 = Happy, etc.): ");
 	Serial.println(selected_bar);
 
-	number_leds_selected = ((number_leds_selected >= NUM_LEDS_PER_BAR) ? NUM_LEDS_PER_BAR : number_leds_selected);
-        Serial.print("number_leds_selected = ");
-	Serial.println(number_leds_selected);
+	number_leds_to_light = ((number_leds_to_light >= NUM_LEDS_PER_BAR) ? NUM_LEDS_PER_BAR : number_leds_to_light);
+  Serial.print("number_leds_to_light = ");
+	Serial.println(number_leds_to_light);
 
 	uint8_t starting_idx = selected_bar * NUM_LEDS_PER_BAR;
-	if (LEDon) { // Turn on the LEDs
-		for (uint8_t led_idx = starting_idx; led_idx < (number_leds_selected + starting_idx); led_idx++) {
+	for (uint8_t led_idx = starting_idx; led_idx < (number_leds_to_light + starting_idx); led_idx++) {
 			Serial.print("led_idx = ");
 			Serial.println(led_idx);
 			leds[led_idx] = led_fill_color;
-		}
-	}
-	else { // Turn off the LEDs
-		for (uint8_t led_idx = starting_idx; led_idx < (number_leds_selected + starting_idx); led_idx++) {
-			Serial.print("led_idx = ");
-			Serial.println(led_idx);
-			leds[led_idx] = CRGB::Black;
-		}
-	}
+  }
 	FastLED.show();
 }
 
