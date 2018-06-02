@@ -19,7 +19,7 @@ FASTLED_USING_NAMESPACE
 
 CRGB leds[NUM_LEDS];
 
-enum responses { MONEY, HAPPINESS, INNOVATION, IMPACT, KNOWLEDGE, CREATIVITY, MAX_RESPONSES };
+enum responses { MONEY, INNOVATION, KNOWLEDGE, CREATIVITY, IMPACT, HAPPINESS, MAX_RESPONSES };
 
 // NUM_LEDS_PER_BAR strings for each option (MONEY, HAPPINESS, etc.) allows user to enter a sentence
 static char user_input[MAX_RESPONSES][NUM_LEDS_PER_BAR][128];
@@ -30,7 +30,7 @@ static const char ssid[] = "Passion Pillar";
 static const char password[] = "";
 MDNSResponder mdns;
 
-static void writeLED(bool LEDon, responses selected_bar, uint8_t number_leds_selected);
+static void writeLED(uint8_t selected_bar, float number_responses);
 
 ESP8266WiFiMulti WiFiMulti;
 
@@ -41,704 +41,343 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
   <!DOCTYPE html>
   <html lang="en">
   <head>
-      <title>Passion Pillar</title>
-      <style>
+    <meta charset="utf-8">
+    <title>UW Community Pillar</title>
+    <style>
+    * {
+      font-family: Helvetica;
+    }
 
+    body {
+      background-color: #F1F2F1;
+      height: 100%;
+    }
 
-      a {
-          text-decoration: none;
-      }
-      .full-width-text {
-          width: 100%;
-          text-align: center;
-          font-family: avenir;
-      }
+    .container {
+      text-align: center;
+    }
 
-      .title {
-          padding-top: 5em;
-          padding-bottom: 5em;
-      }
+    #title {
+      text-align: center;
+      letter-spacing: .20em;
+      font-weight: 600;
+      color: #9A9B9A;
+    }
 
-      .container {
-          /*display: flex;
-          flex-wrap: wrap;*/
+    h1 {
+      color: #494A49;
+      text-align: center;
+    }
 
-      }
-
-      div.question {
-          display:inline-block;
-          padding-top: 5em;
-          max-width: 400px;
-          padding-bottom: 2em;
-      }
-
-      .item {
-          /*flex-grow: 1;
-          flex-basis: 500px;*/
-
-      }
-
-      .category {
-        margin: 2em;
-      }
-
-      .categoryButton {
-        border-style: solid;
-        border-color: white;
-        border-width: thick;
-        text-align: center;
-        font-family: avenir;
-      }
-      p.percentage {
-          margin-top: -4px;
-          margin-left: 7px;
-          display: inline-block;
-          color: white;
-          float:left;
-          font-family: Helvetica;
-      }
-      h1 {
-          margin: auto;
-          font-size: 3.5em;
-          color: white;
-      }
-
-      h3 {
-          font-size: 2.2em;
-          color: white;
-          margin-bottom: .25em;
-      }
-      form {
-          width: 80%;
-      }
-      input[type=text] {
-          font-family: avenir;
-          color: white;
-          font-size: 24px;
-          border: none;
-          background-color: inherit;
-          border-bottom: 6px solid white;
-          width: 80%;
-          float:left;
-      }
-      input[type=text]:focus {
-          outline:none;
-      }
-      #submit {
-          font-size: .9em;
-          float:left;
-          color: white;
-
-          border: none;
-          background-color: inherit;
-          text-decoration: none;
-          text-align: center;
-          padding-left:2em;
-          padding-top: 3px;
-          opacity: 1;
-      }
-
-      #submit:hover {
-          cursor: pointer;
-          opacity: .5;
-          animation: 2s ease;
-          color: black;
-      }
-      #submit:focus {
-          cursor: pointer;
-          outline:0;
-      }
-
-      .white-button {
-          font-size: .9em;
-          float:left;
-          color: white;
-
-          border: none;
-          background-color: inherit;
-          text-decoration: none;
-          text-align: center;
-          padding-top: 3px;
-          opacity: 1;
-          border-style: solid;
-          border-color: white;
-          border-width: thick;
-          font-family: avenir;
-      }
-
-      .white-button:hover {
-          cursor: pointer;
-          opacity: .5;
-          animation: 2s ease;
-          color: black;
-      }
-      .white-button:focus {
-          cursor: pointer;
-          outline:0;
-      }
-
-      @keyframes buttonHover {
-          0% {color: white}
-          25% {}
-      }
-      .money-bar {
-          display:inline-block;
-          float:left;
-          width: 0%;
-          height: 1em;
-          background-color: #7ED321;
-          transition: width 2s;
-      }
-      .happiness-bar {
-          display:inline-block;
-          float:left;
-          width: 0%;
-          height: 1em;
-          background-color: #F8E71C;
-          transition: width 2s;
-      }
-      .innovation-bar {
-          display:inline-block;
-          float:left;
-          width: 0%;
-          height: 1em;
-          background-color: #2DCFF6;
-          transition: width 2s;
-      }
-      .impact-bar {
-          display:inline-block;
-          float:left;
-          width: 0%;
-          height: 1em;
-          background-color: #D0021B;
-          transition: width 2s;
-      }
-      .knowledge-bar {
-          display:inline-block;
-          float:left;
-          width: 0%;
-          height: 1em;
-          background-color: #FF7F11;
-          transition: width 2s;
-      }
-      .creativity-bar {
-          display:inline-block;
-          float:left;
-          width: 0%;
-          height: 1em;
-          background-color: #A999FF;
-          transition: width 2s;
-      }
-      .main {
-          background-color: black;
-      }
-
-      .innovation {
-          background-color: #49DAFD;
-      }
-      .question-container {
-          margin-left: 15%;
-          width: 80%;
-          top:0;
-          left: 0;
-          position: absolute;
-          visibility: hidden;
-          font-family: avenir;
-      }
-
-      .column {
-        float: left;
+    .column {
+      float: left;
       width: 50%;
+      margin-top: 2%;
+      margin-bottom: 2%;
+    }
+
+    input[type="radio"] {
+      position:fixed;
+      opacity:0;
+    }
+
+    .button {
+      font-size: 2em;
+      font-weight: bold;
+      background-color: white;
+      border-style: solid;
+      border-color: white;
+      border-width: thick;
+      border-radius: 50px;
+      padding-top: 4%;
+      padding-bottom: 4%;
+      margin-bottom: 5%;
+      margin-left: 18%;
+      margin-right: 18%;
+    }
+
+    .money {color: #7BD400;}
+    .innovation {color: #17CEF8;}
+    .knowledge {color: #F6A602;}
+    .creativity {color: #A896FF;}
+    .impact {color: #F18674;}
+    .happiness {color: #FFD43B;}
+    :checked + .money {border-color: #7BD400;}
+    :checked + .innovation {border-color: #17CEF8;}
+    :checked + .knowledge {border-color: #F6A602;}
+    :checked + .creativity {border-color: #A896FF;}
+    :checked + .impact {border-color: #F18674;}
+    :checked + .happiness {border-color: #FFD43B;}
+
+    textarea {
+      resize: none;
+      width: 60%;
+      font-size: 1.2em;
+      font-weight: lighter;
+      border-color: #D8D7D7;
+      border-radius: 5px;
+      padding: 1.5%;
+    }
+
+    #entry_send {
+      color: #999A99;
+      font-size: 1em;
+      font-weight: bold;
+      background-color: white;
+      border-color: white;
+      border-style: solid;
+      border-radius: 50px;
+      padding-top: 1%;
+      padding-bottom: 1%;
+      padding-left: 3%;
+      padding-right: 3%;
+      margin-top: 2%;
+      position: relative;
+      left: 25%;
+    }
+
+    #entry_send:hover {
+      background-color: #D8D7D7;
+      border-color: #D8D7D7;
+    }
+
+    #switch_page {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 25px;
+      height: 25px;
+    }
+    
+    #reset_switch {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 25px;
+      height: 25px;
+    }
+
+    #responses {
+      display: none;
+    }
+
+    .message__bubble {
+      margin: auto;
+      width: 75%;
+      min-width: 300px;
+      border-radius: 30px;
+      background-color: white;
+      padding: 20px;
+      margin-bottom: 10px;
+    }
+
+    .message__category {
+      text-transform: uppercase;
+      font-size: .75em;
+      font-weight: 600;
+      letter-spacing: .2em
+    }
+
+    .message__text {
+      color: #494A49;
+      font-size: 2em;
+      font-weight: 100;
+      word-wrap:break-word;
+    }
+    </style>
+    <script>
+    function log(msg, log_id) {
+      // document.getElementById("log").innerText += log_id + '\n' + msg + '\n';
+      var message__bubble = document.createElement("div");
+      message__bubble.className = "message__bubble";
+      var category = document.createElement("div");
+      category.className = log_id + " message__category";
+      category.innerHTML = log_id;
+      message__bubble.appendChild(category);
+      var message = document.createElement("div");
+      message.className = "message__text";
+      message.innerHTML = msg;
+      message__bubble.appendChild(message);
+      var log = document.getElementById("log");
+      log.appendChild(message__bubble);
+    }
+    function parse_new_message(msg_header, msg) {
+      switch (msg_header) {
+        case 'MON':
+        log(msg, "money");
+        break;
+        case 'HAP':
+        log(msg, "happiness");
+        break;
+        case 'INN':
+        log(msg, "innovation");
+        break;
+        case 'IMP':
+        log(msg, "impact");
+        break;
+        case 'KNO':
+        log(msg, "knowledge");
+        break;
+        case 'CRE':
+        log(msg, "creativity");
+        break;
       }
-
-      </style>
-      <script>
-      var websock;
-      var totalResponses;
-      var money;
-      var happiness;
-      var innovation;
-      var impact;
-      var knowledge;
-      var creativity;
-
-      var background;
-
-      var moneyBar;
-      var moneyPercentage;
-
-      var happinessBar;
-      var happinessPercentage;
-
-      var impactBar;
-      var impactPercentage;
-
-      var knowledgeBar;
-      var knowledgePercentage;
-
-      var creativityBar;
-      var creativityPercentage;
-
-      function start() {
-        websock = new WebSocket('ws://' + window.location.hostname + ':81/');
-        websock.onopen = function(evt) { console.log('websock open'); };
-        websock.onclose = function(evt) { console.log('websock close'); };
-        websock.onerror = function(evt) { console.log(evt); };
-        websock.onmessage = function(evt) {
-          console.log(evt);
-          if (evt.data === 'money_on') {
-            document.getElementById('money_header').style.color = 'green';
-          }
-          else if (evt.data === 'money_off') {
-            document.getElementById('money_header').style.color = 'black';
-          }
-          else if (evt.data === 'happiness_on') {
-            document.getElementById('happiness_header').style.color = 'yellow';
-          }
-          else if (evt.data === 'happiness_off') {
-            document.getElementById('happiness_header').style.color = 'black';
-          }
-          else if (evt.data === 'innovation_on') {
-            document.getElementById('innovation_header').style.color = 'blue';
-          }
-          else if (evt.data === 'innovation_off') {
-            document.getElementById('innovation_header').style.color = 'black';
-          }
-          else if (evt.data === 'impact_on') {
-            document.getElementById('impact_header').style.color = 'red';
-          }
-          else if (evt.data === 'impact_off') {
-            document.getElementById('impact_header').style.color = 'black';
-          }
-          else if (evt.data === 'knowledge_on') {
-            document.getElementById('knowledge_header').style.color = 'orange';
-          }
-          else if (evt.data === 'knowledge_off') {
-            document.getElementById('knowledge_header').style.color = 'black';
-          }
-          else if (evt.data === 'creativity_on') {
-            document.getElementById('creativity_header').style.color = 'purple';
-          }
-          else if (evt.data === 'creativity_off') {
-            document.getElementById('creativity_header').style.color = 'black';
-          }
-
-
-        };
-      }
-      function buttonclick(e) {
-        // @TODO: When the user presses this button (makes selection),
-        //		redirect the user to a new page which
-        //		asks them to submit some thoughts about that
-        //		-- or redirects the user ot the same page
-        //		but lower down with an anchor
-        websock.send(e.id);
-      }
-      function log(msg, log_id) {
-        document.getElementById(log_id).innerText += msg + '\n';
-        console.log(msg);
-      }
-      function submitclick(e) {
-        var user_input;
-        var msg_send;
-        var log_id;
-        totalResponses = totalResponses + 1;
-        if (e.id === "money_send") {
-        	user_input = document.getElementById('money_entry').value;
-      	msg_send = "MON&" + user_input;
+    }
+    var websock;
+    function start() {
+      websock = new WebSocket('ws://' + window.location.hostname + ':81/');
+      websock.onopen = function(evt) { console.log('websock open'); };
+      websock.onclose = function(evt) { console.log('websock close'); };
+      websock.onerror = function(evt) { console.log(evt); };
+      websock.onmessage = function(evt) {
+        console.log(evt);
+        parse_new_message(evt.data.substring(0, 3), evt.data.substring(3, evt.data.length));
+      };
+    }
+    var selected_button;
+    function buttonclick(e) {
+      selected_button = e.id;
+    }
+    function submitclick(e) {
+      var user_input;
+      var msg_send;
+      var log_id;
+      switch (selected_button) {
+        case 'money':
+        user_input = document.getElementById('entry_field').value;
+        msg_send = "MON&" + user_input;
         log_id = "money_log";
-        money.push(user_input); // from SubmitValues()
-        window.alert(money); // from SubmitValues()
-        var moneyQuestion = document.getElementById("money-question"); // from SubmitValues()
-        moneyQuestion.style.visibility = "hidden"; // from SubmitValues()
-        } else if (e.id === "happiness_send") {
-        	user_input = document.getElementById('happiness_entry').value;
-      	msg_send = "HAP&" + user_input;
-      	log_id = "happiness_log";
-        happiness.push(user_input); // from SubmitValues()
-        window.alert(happiness); // from SubmitValues()
-        var happinessQuestion = document.getElementById("happiness-question"); // from SubmitValues()
-        happinessQuestion.style.visibility = "hidden"; // from SubmitValues()
-        } else if (e.id === "innovation_send") {
-        	user_input = document.getElementById('innovation_entry').value;
-      	msg_send = "INN&" + user_input;
-      	log_id = "innovation_log";
-        innovation.push(user_input); // from SubmitValues()
-        window.alert(innovation); // from SubmitValues()
-        var innovationQuestion = document.getElementById("innovation-question"); // from SubmitValues()
-        innovationQuestion.style.visibility = "hidden"; // from SubmitValues()
-        } else if (e.id === "impact_send") {
-        	user_input = document.getElementById('impact_entry').value;
-      	msg_send = "IMP&" + user_input;
-      	log_id = "impact_log";
-        impact.push(user_input); // from SubmitValues()
-        window.alert(impact); // from SubmitValues()
-        var impactQuestion = document.getElementById("impact-question"); // from SubmitValues()
-        impactQuestion.style.visibility = "hidden"; // from SubmitValues()
-        } else if (e.id === "knowledge_send") {
-        	user_input = document.getElementById('knowledge_entry').value;
-      	msg_send = "KNO&" + user_input;
-      	log_id = "knowledge_log";
-        knowledge.push(user_input); // from SubmitValues()
-        window.alert(knowledge); // from SubmitValues()
-        var knowledgeQuestion = document.getElementById("knowledge-question"); // from SubmitValues()
-        knowledgeQuestion.style.visibility = "hidden"; // from SubmitValues()
-        } else if (e.id === "creativity_send") {
-        	user_input = document.getElementById('creativity_entry').value;
-      	msg_send = "CRE&" + user_input;
-      	log_id = "creativity_log";
-        creativity.push(user_input); // from SubmitValues()
-        window.alert(creativity); // from SubmitValues()
-        var creativityQuestion = document.getElementById("creativity-question"); // from SubmitValues()
-        creativityQuestion.style.visibility = "hidden"; // from SubmitValues()
-        }
-        log("Someone wrote: " + user_input, log_id);
-        backToHome();
-        websock.send(msg_send);
+        break;
+        case 'happiness':
+        user_input = document.getElementById('entry_field').value;
+        msg_send = "HAP&" + user_input;
+        log_id = "happiness_log";
+        break;
+        case 'innovation':
+        user_input = document.getElementById('entry_field').value;
+        msg_send = "INN&" + user_input;
+        log_id = "innovation_log";
+        break;
+        case 'impact':
+        user_input = document.getElementById('entry_field').value;
+        msg_send = "IMP&" + user_input;
+        log_id = "impact_log";
+        break;
+        case 'knowledge':
+        user_input = document.getElementById('entry_field').value;
+        msg_send = "KNO&" + user_input;
+        log_id = "knowledge_log";
+        break;
+        case 'creativity':
+        user_input = document.getElementById('entry_field').value;
+        msg_send = "CRE&" + user_input;
+        log_id = "creativity_log";
+        break;
+        default:
+        alert("Please select a category before submitting.");
+        break;
       }
+      // parse_new_message(msg_send.substring(0, 3), msg_send.substring(4, msg_send.length));
+      websock.send(msg_send);
+      websock.send(selected_button);
+      document.getElementById("entry_form").reset();
+    }
 
-      window.onload = function() {
-          init();
-          reloadBars();
+    function switchPages() {
+      console.log('switch');
+      var prompt = document.getElementById("prompt");
+      var responses = document.getElementById("responses");
+      if (prompt.style.display === "none") {
+        prompt.style.display = "block";
+        responses.style.display = "none";
+      } else {
+        prompt.style.display = "none";
+        responses.style.display = "block";
       }
+    }
 
-      function reloadBars() {
-          moneyBar.style.width = Math.round((money.length / totalResponses) * 100) + '%';
-          moneyPercentage.innerHTML = moneyBar.style.width;
-
-          happinessBar.style.width = Math.round((happiness.length / totalResponses) * 100) + '%';
-          happinessPercentage.innerHTML = happinessBar.style.width;
-
-          innovationBar.style.width = Math.round((innovation.length / totalResponses) * 100) + '%';
-          innovationPercentage.innerHTML = innovationBar.style.width;
-          console.log(innovationBar.style.width);
-
-          impactBar.style.width = Math.round((impact.length / totalResponses) * 100) + '%';
-          impactPercentage.innerHTML = impactBar.style.width;
-
-          knowledgeBar.style.width = Math.round((knowledge.length / totalResponses) * 100) + '%';
-          knowledgePercentage.innerHTML = knowledgeBar.style.width;
-
-          creativityBar.style.width = Math.round((creativity.length / totalResponses) * 100) + '%';
-          creativityPercentage.innerHTML = creativityBar.style.width;
-      }
-
-      function init() {
-          money = ["I want to make money","help"];
-          happiness = ["a","b","c"];
-          innovation = ["a"];
-          impact = ["a","b","c","d"];
-          knowledge = ["a","b","c","d","e","f"];
-          creativity = ["a"];
-          totalResponses = money.length + happiness.length + innovation.length + impact.length +
-                              knowledge.length + creativity.length;
-
-          moneyBar = document.getElementById("money-bar");
-          moneyPercentage = document.getElementById("money-percentage");
-
-          happinessBar = document.getElementById("happiness-bar");
-          happinessPercentage = document.getElementById("happiness-percentage");
-
-          innovationBar = document.getElementById("innovation-bar");
-          innovationPercentage = document.getElementById("innovation-percentage");
-
-          impactBar = document.getElementById("impact-bar");
-          impactPercentage = document.getElementById("impact-percentage");
-
-          knowledgeBar = document.getElementById("knowledge-bar");
-          knowledgePercentage = document.getElementById("knowledge-percentage");
-
-          creativityBar = document.getElementById("creativity-bar");
-          creativityPercentage = document.getElementById("creativity-percentage");
-
-          background = document.body;
-      }
-
-      function switchCategory(category) {
-          switch(category) {
-              case money:
-                  background.style.visibility = "hidden";
-                  background.style.backgroundColor = "#7ED321";
-                  var moneyQuestion = document.getElementById("money-question");
-                  moneyQuestion.style.visibility = "visible";
-                  var innovationQuestion = document.getElementById("innovation-question");
-                  innovationQuestion.style.visibility = "hidden";
-                  break;
-                  console.log(money);
-              case happiness:
-                  background.style.visibility = "hidden";
-                  background.style.backgroundColor = "#F8E71C";
-                  var happinessQuestion = document.getElementById("happiness-question");
-                  happinessQuestion.style.visibility = "visible";
-                  var happinessQuestion = document.getElementById("happiness-question");
-                  break;
-                  console.log(happiness);
-              case innovation:
-                  background.style.visibility = "hidden";
-                  background.style.backgroundColor = "#2DCFF6";
-                  var innovationQuestion = document.getElementById("innovation-question");
-                  innovationQuestion.style.visibility = "visible";
-                  break;
-                  console.log(innovation);
-              case impact:
-                  background.style.visibility = "hidden";
-                  background.style.backgroundColor = "#D0021B";
-                  var impactQuestion = document.getElementById("impact-question");
-                  impactQuestion.style.visibility = "visible";
-                  break;
-                  console.log(impact);
-              case knowledge:
-                  background.style.visibility = "hidden";
-                  background.style.backgroundColor = "#FF7F11";
-                  var knowledgeQuestion = document.getElementById("knowledge-question");
-                  knowledgeQuestion.style.visibility = "visible";
-                  break;
-                  console.log(knowledge);
-              case creativity:
-                  background.style.visibility = "hidden";
-                  background.style.backgroundColor = "#A999FF";
-                  var creativityQuestion = document.getElementById("creativity-question");
-                  creativityQuestion.style.visibility = "visible";
-                  break;
-                  console.log(creativity);
-
-          }
-      }
-
-      function submitValues(category) {
-          switch(category) {
-              case money:
-                  totalResponses = totalResponses + 1;
-                  var response = document.getElementById("money-response");
-                  console.log(response.value);
-                  money.push(response.value);
-                  window.alert(money);
-                  var moneyQuestion = document.getElementById("money-question");
-                  var div = document.createElement("div");
-                  var responseParagraph = document.createElement("p");
-                  responseParagraph.innerHTML = response.value;
-                  div.appendChild(responseParagraph);
-                  document.getElementById("main").appendChild(div);
-                  moneyQuestion.style.visibility = "hidden";
-                  backToHome();
-                  break;
-              case happiness:
-                  totalResponses = totalResponses + 1;
-                  var response = document.getElementById("happiness-response");
-                  console.log(response.value);
-                  happiness.push(response.value);
-                  window.alert(happiness);
-                  var happinessQuestion = document.getElementById("happiness-question");
-                  happinessQuestion.style.visibility = "hidden";
-                  backToHome();
-                  break;
-              case innovation:
-                  totalResponses = totalResponses + 1;
-                  var response = document.getElementById("innovation-response");
-                  console.log(response.value);
-                  innovation.push(response.value);
-                  window.alert(innovation);
-                  var innovationQuestion = document.getElementById("innovation-question");
-                  innovationQuestion.style.visibility = "hidden";
-                  backToHome();
-                  break;
-              case impact:
-                  totalResponses = totalResponses + 1;
-                  var response = document.getElementById("impact-response");
-                  console.log(response.value);
-                  impact.push(response.value);
-                  window.alert(impact);
-                  var impactQuestion = document.getElementById("impact-question");
-                  impactQuestion.style.visibility = "hidden";
-                  backToHome();
-                  break;
-              case knowledge:
-                  totalResponses = totalResponses + 1;
-                  var response = document.getElementById("knowledge-response");
-                  console.log(response.value);
-                  knowledge.push(response.value);
-                  window.alert(knowledge);
-                  var knowledgeQuestion = document.getElementById("knowledge-question");
-                  knowledgeQuestion.style.visibility = "hidden";
-                  backToHome();
-                  break;
-              case creativity:
-                  totalResponses = totalResponses + 1;
-                  var response = document.getElementById("creativity-response");
-                  console.log(response.value);
-                  creativity.push(response.value);
-                  window.alert(creativity);
-                  var creativityQuestion = document.getElementById("creativity-question");
-                  creativityQuestion.style.visibility = "hidden";
-                  backToHome();
-                  break;
-          }
-      }
-
-      function backToHome() {
-          background.style.backgroundColor = "black";
-          reloadBars();
-          background.style.visibility = "visible";
-      }
-      </script>
-      <script type="text/javascript" src="scripts/lights.js"></script>
-      <meta charset="UTF-8">
+    function resetLEDs() {
+      console.log('reset LEDs');
+      websock.send("reset");
+    }
+    </script>
   </head>
-  <body class="main" id="main">
-      <div class="full-width-text title">
-          <h1>Which of the following is your greatest motivation for pursuing higher education?</h1>
+  <body onload="javascript:start();">
+    <p id="title">UW COMMUNITY PILLAR</p>
+    <span id="switch_page" onclick="switchPages()"></span>
+    <span id="reset_switch" onclick="resetLEDs()"></span>
+    <div id="prompt">
+      <div class="container" id="header">
+        <h1>What drives you most as a member of the UW community?</h1>
       </div>
-      <div class="container">
-        <div class="column">
-          <a class="item" onclick="switchCategory(money)" href="#">
-              <div class="category">
-                  <h3 class="categoryButton">Money</h3>
-                  <div class="money-bar" id="money-bar"></div><p class="percentage" id="money-percentage">0%</p>
-              </div>
-          </a>
-          <a class="item" onclick="switchCategory(happiness)" href="#">
-              <div class="category">
-                  <h3 class="categoryButton">Happiness</h3>
-                  <div class="happiness-bar" id="happiness-bar"></div><p class="percentage" id="happiness-percentage">0%</p>
-              </div>
-          </a>
-          <a class="item" onclick="switchCategory(innovation)" href="#">
-              <div class="category">
-                  <h3 class="categoryButton">Innovation</h3>
-                  <div class="innovation-bar" id="innovation-bar"></div><p class="percentage" id="innovation-percentage">0%</p>
-              </div>
-          </a>
-        </div>
-        <div class="column">
-          <a class="item" onclick="switchCategory(impact)" href="#">
-          <div class="category">
-              <h3 class="categoryButton">Impact</h3>
-              <div class="impact-bar" id="impact-bar"></div><p class="percentage" id="impact-percentage">0%</p>
+      <div class="container" id="form">
+        <form id="entry_form">
+          <div class="column">
+            <label class="test">
+              <input type="radio" name="category" id="money" onclick="buttonclick(this);"/>
+              <div class="button money">Money</div>
+            </label>
+            <label class="test">
+              <input type="radio" name="category" id="innovation" onclick="buttonclick(this);"/>
+              <div class="button innovation">Innovation</div>
+            </label>
+            <label class="test">
+              <input type="radio" name="category" id="knowledge" onclick="buttonclick(this);"/>
+              <div class="button knowledge">Knowledge</div>
+            </label>
           </div>
-          </a>
-          <a class="item" onclick="switchCategory(knowledge)" href="#">
-          <div class="category">
-              <h3 class="categoryButton">Knowledge</h3>
-              <div class="knowledge-bar" id="knowledge-bar"></div><p class="percentage" id="knowledge-percentage">0%</p>
+          <div class="column">
+            <label class="test">
+              <input type="radio" name="category" id="creativity" onclick="buttonclick(this);"/>
+              <div class="button creativity">Creativity</div>
+            </label>
+            <label class="test">
+              <input type="radio" name="category" id="impact" onclick="buttonclick(this);"/>
+              <div class="button impact">Impact</div>
+            </label>
+            <label class="test">
+              <input type="radio" name="category" id="happiness" onclick="buttonclick(this);"/>
+              <div class="button happiness">Happiness</div>
+            </label>
           </div>
-          </a>
-          <a class="item" onclick="switchCategory(creativity)" href="#">
-          <div class="category">
-              <h3 class="categoryButton">Creativity</h3>
-              <div class="creativity-bar" id="creativity-bar"></div><p class="percentage" id="creativity-percentage">0%</p>
+          <textarea id="entry_field" rows="5" cols="50" placeholder="Tell us why!"></textarea>
+          <div id="submit">
+            <button id="entry_send" onclick="submitclick(this);" type='button' value="Submit">Submit</button>
           </div>
-          </a>
-        </div>
+        </form>
       </div>
-      <div class="question-container" id="innovation-question">
-        <div class="question">
-          <h3 class="subtitle">What is it about innovation that drive you?</h3>
-        </div>
-        <div method="post" class="response">
-          <button class="white-button" id="innovation_on"  type="button" onclick="buttonclick(this);">On</button>
-          <button class="white-button" id="innovation_off" type="button" onclick="buttonclick(this);">Off</button>
-          <br>
-          <br>
-          <br>
-          <input type="text" id="innovation_entry">
-          <button class="white-button" id="innovation_send" onclick="submitclick(this);">SUBMIT</button>
-          <br>
-          <br>
-          <pre id="innovation_log"></pre>
-        </div>
-
-     </div>
-
-     <div class="question-container" id="happiness-question">
-       <div class="question">
-         <h3 class="subtitle">What is it about happiness that drive you?</h3>
-       </div>
-       <div method="post" class="response">
-         <button class="white-button" id="happiness_on"  type="button" onclick="buttonclick(this);">On</button>
-         <button class="white-button" id="happiness_off" type="button" onclick="buttonclick(this);">Off</button>
-         <br>
-         <br>
-         <br>
-         <input type="text" id="happiness_entry">
-         <button class="white-button" id="happiness_send" onclick="submitclick(this);">SUBMIT</button>
-         <br>
-         <br>
-         <pre id="happiness_log"></pre>
-       </div>
     </div>
-      <div class="question-container" id="money-question">
-        <div class="question">
-          <h3 class="subtitle">What is it about money that drive you?</h3>
+    <div id="responses">
+      <h1>Here's what others have said:</h1>
+      <div id="log">
+        <!--<div class="message__bubble">
+          <div class="money message__category">money</div>
+          <div class="message__text">I like money because it lets me hang out with friends.</div>
         </div>
-        <div method="post" class="response">
-          <button class="white-button" id="money_on"  type="button" onclick="buttonclick(this);">On</button>
-          <button class="white-button" id="money_off" type="button" onclick="buttonclick(this);">Off</button>
-          <br>
-          <br>
-          <br>
-          <input type="text" id="money_entry">
-          <button class="white-button" id="money_send" onclick="submitclick(this);">SUBMIT</button>
-          <br>
-          <br>
-          <pre id="money_log"></pre>
+        <!--<div class="message__bubble">
+          <div class="happiness message__category">happiness</div>
+          <div class="message__text">Smile everyday!</div>-->
         </div>
-      </div>
-      <div class="question-container" id="impact-question">
-        <div class="question">
-          <h3 class="subtitle">What is it about impact that drive you?</h3>
+        <!--<div class="message__bubble">
+          <div class="knowledge message__category">knowledge</div>
+          <div class="message__text">Knowledge = Power</div>-->
         </div>
-        <div method="post" class="response">
-          <button class="white-button" id="impact_on"  type="button" onclick="buttonclick(this);">On</button>
-          <button class="white-button" id="impact_off" type="button" onclick="buttonclick(this);">Off</button>
-          <br>
-          <br>
-          <br>
-          <input type="text" id="impact_entry">
-          <button class="white-button" id="impact_send" onclick="submitclick(this);">SUBMIT</button>
-          <br>
-          <br>
-          <pre id="impact_log"></pre>
+        <!--<div class="message__bubble">
+          <div class="impact message__category">impact</div>
+          <div class="message__text">I want to make an impact with my life to give back to those who had an impact on me.</div>-->
+        </div>
+        <!--<div class="message__bubble">
+          <div class="creativity message__category">creativity</div>
+          <div class="message__text">Making things is awesome!</div>-->
+        </div>
+        <!--<div class="message__bubble">
+          <div class="innovation message__category">innovation</div>
+          <div class="message__text">We should always be innovating.</div>-->
         </div>
       </div>
-      <div class="question-container" id="knowledge-question">
-        <div class="question">
-          <h3 class="subtitle">What is it about knowledge that drive you?</h3>
-        </div>
-        <div method="post" class="response">
-          <button class="white-button" id="knowledge_on"  type="button" onclick="buttonclick(this);">On</button>
-          <button class="white-button" id="knowledge_off" type="button" onclick="buttonclick(this);">Off</button>
-          <br>
-          <br>
-          <br>
-          <input type="text" id="knowledge_entry">
-          <button class="white-button" id="knowledge_send" onclick="submitclick(this);">SUBMIT</button>
-          <br>
-          <br>
-          <pre id="knowledge_log"></pre>
-        </div>
-      </div>
-      <div class="question-container" id="creativity-question">
-        <div class="question">
-          <h3 class="subtitle">What is it about creativity that drive you?</h3>
-        </div>
-        <div method="post" class="response">
-          <button class="white-button" id="creativity_on"  type="button" onclick="buttonclick(this);">On</button>
-          <button class="white-button" id="creativity_off" type="button" onclick="buttonclick(this);">Off</button>
-          <br>
-          <br>
-          <br>
-          <input type="text" id="creativity_entry">
-          <button class="white-button" id="creativity_send" onclick="submitclick(this);">SUBMIT</button>
-          <br>
-          <br>
-          <pre id="creativity_log"></pre>
-        </div>
-      </div>
-
+    </div>
   </body>
-
   </html>
-
 )rawliteral";
 
 // 0->255 where 255 is max brightness
@@ -755,8 +394,23 @@ void process_payload(char* payload, responses selection) {
 	strcpy(user_input[selection][responses_per_bar[selection]], split);
 }
 
+float total_responses = 0;
+
+static void update_LED_strip(void) {
+  CRGB led_fill_color = CRGB::Black;
+  
+  // reset the LED strip
+  fill_solid(leds, NUM_LEDS, led_fill_color);
+  FastLED.show();
+  
+  for (int response = MONEY; response < MAX_RESPONSES; response++) {
+    writeLED(response, responses_per_bar[response]);
+  }
+}
+
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
 {
+  bool need_to_update_strip = false;
 	Serial.printf("webSocketEvent(%d, %d, ...)\r\n", num, type);
 	switch (type) {
 		case WStype_DISCONNECTED:
@@ -770,72 +424,65 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
 				if (LEDStatus) {
 					webSocket.sendTXT(num, "money_on", 8);
 				}
-				else {
-					webSocket.sendTXT(num, "money_off", 9);
-				}
 			}
 			break;
 		case WStype_TEXT:
 			Serial.printf("[%u] get Text: %s\r\n", num, payload);
 
-			if (strcmp("money_on", (const char *)payload) == 0) {
-				writeLED(true, MONEY, responses_per_bar[MONEY]++);
-			}
-			else if (strcmp("money_off", (const char *)payload) == 0) {
-				writeLED(false, MONEY, NUM_LEDS_PER_BAR);
+			if (strcmp("money", (const char *)payload) == 0) {
+				responses_per_bar[MONEY]++;
+        need_to_update_strip = true;
 			}
 			else if (strncmp("MON", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, MONEY);
 			}
-			else if (strcmp("happiness_on", (const char *)payload) == 0) {
-				writeLED(true, HAPPINESS, responses_per_bar[HAPPINESS]++);
-			}
-			else if (strcmp("happiness_off", (const char *)payload) == 0) {
-				writeLED(false, HAPPINESS, NUM_LEDS_PER_BAR);
+			else if (strcmp("happiness", (const char *)payload) == 0) {
+				responses_per_bar[HAPPINESS]++;
+        need_to_update_strip = true;
 			}
 			else if (strncmp("HAP", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, HAPPINESS);
 			}
-			else if (strcmp("innovation_on", (const char *)payload) == 0) {
-				writeLED(true, INNOVATION, responses_per_bar[INNOVATION]++);
-			}
-			else if (strcmp("innovation_off", (const char *)payload) == 0) {
-				writeLED(false, INNOVATION, NUM_LEDS_PER_BAR);
+			else if (strcmp("innovation", (const char *)payload) == 0) {
+				responses_per_bar[INNOVATION]++;
+        need_to_update_strip = true;
 			}
 			else if (strncmp("INN", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, INNOVATION);
 			}
-			else if (strcmp("impact_on", (const char *)payload) == 0) {
-				writeLED(true, IMPACT, responses_per_bar[IMPACT]++);
-			}
-			else if (strcmp("impact_off", (const char *)payload) == 0) {
-				writeLED(false, IMPACT, NUM_LEDS_PER_BAR);
+			else if (strcmp("impact", (const char *)payload) == 0) {
+				responses_per_bar[IMPACT]++;
+        need_to_update_strip = true;
 			}
 			else if (strncmp("IMP", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, IMPACT);
 			}
-			else if (strcmp("knowledge_on", (const char *)payload) == 0) {
-				writeLED(true, KNOWLEDGE, responses_per_bar[KNOWLEDGE]++);
-			}
-			else if (strcmp("knowledge_off", (const char *)payload) == 0) {
-				writeLED(false, KNOWLEDGE, NUM_LEDS_PER_BAR);
+			else if (strcmp("knowledge", (const char *)payload) == 0) {
+				responses_per_bar[KNOWLEDGE]++;
+        need_to_update_strip = true;
 			}
 			else if (strncmp("KNO", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, KNOWLEDGE);
 			}
-			else if (strcmp("creativity_on", (const char *)payload) == 0) {
-				writeLED(true, CREATIVITY, responses_per_bar[CREATIVITY]++);
-			}
-			else if (strcmp("creativity_off", (const char *)payload) == 0) {
-				writeLED(false, CREATIVITY, NUM_LEDS_PER_BAR);
+			else if (strcmp("creativity", (const char *)payload) == 0) {
+				responses_per_bar[CREATIVITY]++;
+        need_to_update_strip = true;
 			}
 			else if (strncmp("CRE", (const char*)payload, 3) == 0) {
 				process_payload((char*)payload, CREATIVITY);
 			}
-
+      else if (strncmp("reset", (const char *)payload, 5) == 0) {
+        update_LED_strip();
+      }
 			else {
 				Serial.println("Unknown command");
 			}
+
+      if (need_to_update_strip) {
+        total_responses++;
+        update_LED_strip();
+      }
+      
 			// send data to all connected clients
 			webSocket.broadcastTXT(payload, length);
 			break;
@@ -873,11 +520,10 @@ void handleNotFound()
 	server.send(404, "text/plain", message);
 }
 
-static void writeLED(bool LEDon, responses selected_bar, uint8_t number_leds_selected)
+static void writeLED(uint8_t selected_bar, float number_responses)
 {
-	LEDStatus = LEDon;
 	CRGB led_fill_color = CRGB::Black;
-
+  
 	if (selected_bar == MONEY) {
 		led_fill_color = CRGB::Green;
 	} else if (selected_bar == HAPPINESS) {
@@ -892,28 +538,26 @@ static void writeLED(bool LEDon, responses selected_bar, uint8_t number_leds_sel
 		led_fill_color = CRGB::Purple;
 	}
 
+  uint8_t number_leds_to_light = round((number_responses/total_responses) * NUM_LEDS_PER_BAR);
+
+  Serial.print("number_responses_for_category = ");
+  Serial.println(number_responses);
+  Serial.print("total_responses = ");
+  Serial.println(total_responses);
+
 	Serial.print("Selected bar (0 = Money, 1 = Happy, etc.): ");
 	Serial.println(selected_bar);
 
-	number_leds_selected = ((number_leds_selected >= NUM_LEDS_PER_BAR) ? NUM_LEDS_PER_BAR : number_leds_selected);
-        Serial.print("number_leds_selected = ");
-	Serial.println(number_leds_selected);
+	number_leds_to_light = ((number_leds_to_light >= NUM_LEDS_PER_BAR) ? NUM_LEDS_PER_BAR : number_leds_to_light);
+  Serial.print("number_leds_to_light = ");
+	Serial.println(number_leds_to_light);
 
 	uint8_t starting_idx = selected_bar * NUM_LEDS_PER_BAR;
-	if (LEDon) { // Turn on the LEDs
-		for (uint8_t led_idx = starting_idx; led_idx < (number_leds_selected + starting_idx); led_idx++) {
+	for (uint8_t led_idx = starting_idx; led_idx < (number_leds_to_light + starting_idx); led_idx++) {
 			Serial.print("led_idx = ");
 			Serial.println(led_idx);
 			leds[led_idx] = led_fill_color;
-		}
-	}
-	else { // Turn off the LEDs
-		for (uint8_t led_idx = starting_idx; led_idx < (number_leds_selected + starting_idx); led_idx++) {
-			Serial.print("led_idx = ");
-			Serial.println(led_idx);
-			leds[led_idx] = CRGB::Black;
-		}
-	}
+  }
 	FastLED.show();
 }
 
