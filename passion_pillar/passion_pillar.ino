@@ -308,7 +308,7 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
     <span id="reset_switch" onclick="resetLEDs()"></span>
     <div id="prompt">
       <div class="container" id="header">
-        <h1>What drives you most as a student at UW?</h1>
+        <h1>What drives you most as a member of the UW community?</h1>
       </div>
       <div class="container" id="form">
         <form id="entry_form">
